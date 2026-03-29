@@ -5,6 +5,7 @@ import {
   DEPLOYED_SUPABASE_CONFIG_ERROR,
   isSupabaseConfigured,
 } from "@/lib/env";
+import { getDatabaseFailureKind } from "@/server/db/errors";
 import { getDebateRepository } from "@/server/repositories/debate-repository";
 
 export async function requireAppUser() {
@@ -26,14 +27,22 @@ export async function requireAppUser() {
 
 export async function getDebatesForCurrentUser() {
   const user = await requireAppUser();
-  const repository = await getDebateRepository();
-  return repository.listDebates(user.id);
+  try {
+    const repository = await getDebateRepository();
+    return repository.listDebates(user.id);
+  } catch (error) {
+    redirect(`/settings?setup=database&kind=${getDatabaseFailureKind(error)}`);
+  }
 }
 
 export async function getDebateForCurrentUser(debateId: string) {
   const user = await requireAppUser();
-  const repository = await getDebateRepository();
-  return repository.getDebate(user.id, debateId);
+  try {
+    const repository = await getDebateRepository();
+    return repository.getDebate(user.id, debateId);
+  } catch (error) {
+    redirect(`/settings?setup=database&kind=${getDatabaseFailureKind(error)}`);
+  }
 }
 
 export function getAppModeLabel() {

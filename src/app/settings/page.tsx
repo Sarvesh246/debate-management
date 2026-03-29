@@ -10,11 +10,22 @@ import {
   getMissingSupabaseServerEnvNames,
   isSupabaseConfigured,
 } from "@/lib/env";
+import {
+  getDatabaseSetupGuidance,
+  type DatabaseFailureKind,
+} from "@/server/db/errors";
 
-export default function SettingsPage() {
+export default async function SettingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ setup?: string; kind?: string }>;
+}) {
+  const params = await searchParams;
   const needsSupabaseSetup =
     !isSupabaseConfigured() && !canUseLocalWorkspaceMode();
   const missingSupabaseEnvNames = getMissingSupabaseServerEnvNames();
+  const databaseSetupKind = (params.kind ?? "unknown") as DatabaseFailureKind;
+  const needsDatabaseSetup = params.setup === "database";
 
   return (
     <div className="min-h-screen bg-background">
@@ -49,6 +60,28 @@ export default function SettingsPage() {
                 ))}
               </div>
               <p>Add them to this Vercel project, not just the team store, then redeploy.</p>
+            </CardContent>
+          </Card>
+        ) : null}
+
+        {needsDatabaseSetup ? (
+          <Card className="border-amber-500/25 bg-amber-500/10">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-amber-950 dark:text-amber-100">
+                <ShieldAlert className="size-5" />
+                Database setup issue
+              </CardTitle>
+              <CardDescription className="text-amber-900/80 dark:text-amber-200/90">
+                The deployment can see your environment variables, but the first database query failed.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-amber-950 dark:text-amber-100">
+              <p>{getDatabaseSetupGuidance(databaseSetupKind)}</p>
+              {databaseSetupKind === "schema" ? (
+                <div className="rounded-2xl border border-amber-500/20 bg-background/70 p-4 font-mono text-xs leading-6 text-foreground">
+                  npm run db:push
+                </div>
+              ) : null}
             </CardContent>
           </Card>
         ) : null}
