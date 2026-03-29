@@ -1,11 +1,23 @@
 export type DatabaseFailureKind = "schema" | "connection" | "unknown";
 
-function getErrorText(error: unknown) {
+function collectErrorTexts(error: unknown, seen = new Set<unknown>()): string[] {
+  if (!error || seen.has(error)) {
+    return [];
+  }
+  seen.add(error);
+
   if (error instanceof Error) {
-    return `${error.name}: ${error.message}`;
+    return [
+      `${error.name}: ${error.message}`,
+      ...collectErrorTexts(error.cause, seen),
+    ];
   }
 
-  return String(error);
+  return [String(error)];
+}
+
+function getErrorText(error: unknown) {
+  return collectErrorTexts(error).join(" | ");
 }
 
 export function getDatabaseFailureKind(error: unknown): DatabaseFailureKind {
@@ -33,6 +45,14 @@ export function getDatabaseFailureKind(error: unknown): DatabaseFailureKind {
   }
 
   return "unknown";
+}
+
+export function getDatabaseFailureDetail(error: unknown) {
+  const entries = collectErrorTexts(error)
+    .map((entry) => entry.replace(/\s+/g, " ").trim())
+    .filter(Boolean);
+
+  return entries.at(-1) ?? "Unknown database error";
 }
 
 export function getDatabaseSetupGuidance(kind: DatabaseFailureKind) {

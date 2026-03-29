@@ -1,12 +1,12 @@
 import {
   canUseLocalWorkspaceMode,
-  getEnv,
   getMissingSupabaseServerEnvNames,
   isGeminiConfigured,
   isSupabaseConfigured,
   isTavilyConfigured,
 } from "@/lib/env";
 import type { CapabilityDescriptor, CapabilitySnapshot, GenerationMode } from "@/features/debates/types";
+import { getPersistenceCapability } from "@/server/db/health";
 
 function createDescriptor(
   label: string,
@@ -16,13 +16,14 @@ function createDescriptor(
   return { label, status, detail };
 }
 
-export function getCapabilitySnapshot(): CapabilitySnapshot {
+export async function getCapabilitySnapshot(): Promise<CapabilitySnapshot> {
   const hasSupabase = isSupabaseConfigured();
   const missingSupabaseEnvNames = getMissingSupabaseServerEnvNames();
   const localWorkspaceModeAvailable = canUseLocalWorkspaceMode();
   const hasGemini = isGeminiConfigured();
   const hasTavily = isTavilyConfigured();
   const overallMode: GenerationMode = hasGemini ? "provider" : "deterministic";
+  const persistence = await getPersistenceCapability();
 
   return {
     auth: hasSupabase
@@ -38,19 +39,7 @@ export function getCapabilitySnapshot(): CapabilitySnapshot {
             "unavailable",
             `Supabase Auth is required in deployed environments. Missing: ${missingSupabaseEnvNames.join(", ")}.`,
           ),
-    persistence: hasSupabase
-      ? createDescriptor("Persistence", "ready", "Supabase Postgres is configured.")
-      : localWorkspaceModeAvailable
-        ? createDescriptor(
-            "Persistence",
-            "degraded",
-            "Database env is missing. Debate data falls back to the local mock store.",
-          )
-        : createDescriptor(
-            "Persistence",
-            "unavailable",
-            `Supabase Postgres is required in deployed environments. Missing: ${missingSupabaseEnvNames.join(", ")}.`,
-          ),
+    persistence,
     publicRetrieval: createDescriptor(
       "Public retrieval",
       "ready",
@@ -82,8 +71,7 @@ export function getCapabilitySnapshot(): CapabilitySnapshot {
 }
 
 export function getDegradationReason() {
-  const env = getEnv();
-  if (!env.GEMINI_API_KEY) {
+  if (!isGeminiConfigured()) {
     return "No Gemini API key configured. Deterministic debate generation is active.";
   }
 

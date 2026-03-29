@@ -8,14 +8,14 @@ afterEach(() => {
 });
 
 describe("capability service", () => {
-  it("reports deterministic fallback when provider keys are missing", () => {
+  it("reports deterministic fallback when provider keys are missing", async () => {
     vi.stubEnv("DATABASE_URL", "");
     vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "");
     vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "");
     vi.stubEnv("GEMINI_API_KEY", "");
     vi.stubEnv("TAVILY_API_KEY", "");
 
-    const snapshot = getCapabilitySnapshot();
+    const snapshot = await getCapabilitySnapshot();
 
     expect(snapshot.overallMode).toBe("deterministic");
     expect(snapshot.structuredSynthesis.status).toBe("degraded");

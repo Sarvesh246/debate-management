@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  getDatabaseFailureDetail,
   getDatabaseFailureKind,
   getDatabaseSetupGuidance,
 } from "@/server/db/errors";
@@ -17,5 +18,14 @@ describe("database error helpers", () => {
 
     expect(getDatabaseFailureKind(error)).toBe("connection");
     expect(getDatabaseSetupGuidance("connection")).toContain("DATABASE_URL");
+  });
+
+  it("detects wrapped driver errors", () => {
+    const error = new Error('Failed query: select * from "debate_workspaces"', {
+      cause: new Error('relation "debate_workspaces" does not exist'),
+    });
+
+    expect(getDatabaseFailureKind(error)).toBe("schema");
+    expect(getDatabaseFailureDetail(error)).toContain('relation "debate_workspaces" does not exist');
   });
 });

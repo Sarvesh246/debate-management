@@ -1,12 +1,35 @@
 import Link from "next/link";
-import { FolderClock, Plus } from "lucide-react";
+import { unstable_rethrow } from "next/navigation";
+import { FolderClock, Plus, ShieldAlert } from "lucide-react";
 import { SiteHeader } from "@/components/layout/site-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { getAppModeLabel, getDebatesForCurrentUser } from "@/server/services/debate-access";
+import type { DebateWorkspaceRecord } from "@/features/debates/types";
+import { getDatabaseFailureDetail, getDatabaseFailureKind, getDatabaseSetupGuidance } from "@/server/db/errors";
+import { getDebateRepository } from "@/server/repositories/debate-repository";
+import { getAppModeLabel, requireAppUser } from "@/server/services/debate-access";
 
 export default async function DashboardPage() {
-  const debates = await getDebatesForCurrentUser();
+  let debates: DebateWorkspaceRecord[] = [];
+  let databaseIssue:
+    | {
+        kind: ReturnType<typeof getDatabaseFailureKind>;
+        detail: string;
+      }
+    | undefined;
+
+  try {
+    const user = await requireAppUser();
+    const repository = await getDebateRepository();
+    debates = await repository.listDebates(user.id);
+  } catch (error) {
+    unstable_rethrow(error);
+    databaseIssue = {
+      kind: getDatabaseFailureKind(error),
+      detail: getDatabaseFailureDetail(error),
+    };
+    console.error("Dashboard database load failed", error);
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -27,6 +50,36 @@ export default async function DashboardPage() {
             </Link>
           </Button>
         </div>
+
+        {databaseIssue ? (
+          <Card className="border-amber-500/25 bg-amber-500/10">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-amber-950 dark:text-amber-100">
+                <ShieldAlert className="size-5" />
+                Database access issue
+              </CardTitle>
+              <CardDescription className="text-amber-900/80 dark:text-amber-200/90">
+                The deployment reached your auth session, but loading saved debates failed.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4 text-sm text-amber-950 dark:text-amber-100">
+              <p>{getDatabaseSetupGuidance(databaseIssue.kind)}</p>
+              <div className="rounded-2xl border border-amber-500/20 bg-background/70 p-4 font-mono text-xs leading-6 text-foreground">
+                {databaseIssue.detail}
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <Button asChild variant="outline">
+                  <Link href={`/settings?setup=database&kind=${databaseIssue.kind}`}>
+                    Open settings
+                  </Link>
+                </Button>
+                <Button asChild>
+                  <Link href="/debates/new">Start a debate anyway</Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ) : null}
 
         <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
           <Card className="border-border/70 bg-card/75">
