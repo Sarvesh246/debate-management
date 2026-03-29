@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AuthFormCard } from "@/components/auth/auth-form-card";
 import { SiteHeader } from "@/components/layout/site-header";
+import { canUseLocalWorkspaceMode } from "@/lib/env";
 
 export default function LoginPage() {
   return (
@@ -11,7 +12,9 @@ export default function LoginPage() {
           <p className="text-sm uppercase tracking-[0.24em] text-primary">Authentication</p>
           <h1 className="font-heading text-5xl tracking-tight">Return to your command center.</h1>
           <p className="max-w-xl text-lg leading-8 text-muted-foreground">
-            Log in to access saved debates, evidence libraries, practice sessions, and export history. If Supabase is not configured, the app still runs in local workspace mode.
+            {canUseLocalWorkspaceMode()
+              ? "Log in to access saved debates, evidence libraries, practice sessions, and export history. If Supabase is not configured, the app still runs in local workspace mode."
+              : "Log in to access saved debates, evidence libraries, practice sessions, and export history. This deployment requires Supabase Auth and Postgres to be configured."}
           </p>
           <div className="text-sm text-muted-foreground">
             Need an account?{" "}

@@ -13,7 +13,12 @@ test("creates a debate and opens core views in deterministic mode", async ({ pag
       response.status() === 200,
     { timeout: 20_000 },
   );
-  await page.getByRole("button", { name: /build workspace/i }).click();
+  const buildButton = page.getByRole("button", { name: /build workspace/i });
+  await expect(buildButton).toBeEnabled({ timeout: 10_000 });
+  await buildButton.evaluate((el) =>
+    (el as HTMLButtonElement).scrollIntoView({ block: "center", inline: "nearest" }),
+  );
+  await buildButton.click();
   await createResponsePromise;
 
   await expect(page).toHaveURL(/\/debates\/.+\/overview/, { timeout: 20_000 });

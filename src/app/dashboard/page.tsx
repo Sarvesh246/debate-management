@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { FolderClock, Plus } from "lucide-react";
 import { SiteHeader } from "@/components/layout/site-header";
@@ -6,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { getAppModeLabel, getDebatesForCurrentUser } from "@/server/services/debate-access";
 
 export default async function DashboardPage() {
+  await connection();
   const debates = await getDebatesForCurrentUser();
 
   return (

@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/layout/site-header";
 import { WorkspaceView } from "@/components/debate/workspace-view";
@@ -9,6 +10,7 @@ export default async function DebateSectionPage({
 }: {
   params: Promise<{ debateId: string; section: string }>;
 }) {
+  await connection();
   const { debateId, section } = await params;
   if (!workspaceSections.includes(section as WorkspaceSection)) {
     notFound();

@@ -1,5 +1,9 @@
 import { cache } from "react";
-import { isSupabaseConfigured } from "@/lib/env";
+import {
+  canUseLocalWorkspaceMode,
+  DEPLOYED_SUPABASE_CONFIG_ERROR,
+  isSupabaseConfigured,
+} from "@/lib/env";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 
 export interface UserContext {
@@ -11,6 +15,10 @@ export interface UserContext {
 
 export const getCurrentUserContext = cache(async (): Promise<UserContext> => {
   if (!isSupabaseConfigured()) {
+    if (!canUseLocalWorkspaceMode()) {
+      throw new Error(DEPLOYED_SUPABASE_CONFIG_ERROR);
+    }
+
     return {
       id: "local-user",
       email: "local@debate-command.dev",
@@ -47,5 +55,5 @@ export const getCurrentUserContext = cache(async (): Promise<UserContext> => {
 });
 
 export function isLocalMode() {
-  return !isSupabaseConfigured();
+  return !isSupabaseConfigured() && canUseLocalWorkspaceMode();
 }

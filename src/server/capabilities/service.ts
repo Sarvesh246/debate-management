@@ -1,4 +1,10 @@
-import { getEnv, isGeminiConfigured, isSupabaseConfigured, isTavilyConfigured } from "@/lib/env";
+import {
+  canUseLocalWorkspaceMode,
+  getEnv,
+  isGeminiConfigured,
+  isSupabaseConfigured,
+  isTavilyConfigured,
+} from "@/lib/env";
 import type { CapabilityDescriptor, CapabilitySnapshot, GenerationMode } from "@/features/debates/types";
 
 function createDescriptor(
@@ -11,6 +17,7 @@ function createDescriptor(
 
 export function getCapabilitySnapshot(): CapabilitySnapshot {
   const hasSupabase = isSupabaseConfigured();
+  const localWorkspaceModeAvailable = canUseLocalWorkspaceMode();
   const hasGemini = isGeminiConfigured();
   const hasTavily = isTavilyConfigured();
   const overallMode: GenerationMode = hasGemini ? "provider" : "deterministic";
@@ -18,18 +25,30 @@ export function getCapabilitySnapshot(): CapabilitySnapshot {
   return {
     auth: hasSupabase
       ? createDescriptor("Auth", "ready", "Supabase Auth is active.")
-      : createDescriptor(
-          "Auth",
-          "degraded",
-          "Supabase is not configured. The app runs in local workspace mode.",
-        ),
+      : localWorkspaceModeAvailable
+        ? createDescriptor(
+            "Auth",
+            "degraded",
+            "Supabase is not configured. The app runs in local workspace mode.",
+          )
+        : createDescriptor(
+            "Auth",
+            "unavailable",
+            "Supabase Auth is required in deployed environments.",
+          ),
     persistence: hasSupabase
       ? createDescriptor("Persistence", "ready", "Supabase Postgres is configured.")
-      : createDescriptor(
-          "Persistence",
-          "degraded",
-          "Database env is missing. Debate data falls back to the local mock store.",
-        ),
+      : localWorkspaceModeAvailable
+        ? createDescriptor(
+            "Persistence",
+            "degraded",
+            "Database env is missing. Debate data falls back to the local mock store.",
+          )
+        : createDescriptor(
+            "Persistence",
+            "unavailable",
+            "Supabase Postgres is required in deployed environments.",
+          ),
     publicRetrieval: createDescriptor(
       "Public retrieval",
       "ready",

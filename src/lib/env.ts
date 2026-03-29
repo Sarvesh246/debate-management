@@ -1,4 +1,8 @@
 import { z } from "zod";
+export {
+  canUseLocalWorkspaceMode,
+  DEPLOYED_SUPABASE_CONFIG_ERROR,
+} from "./runtime-mode";
 
 const optionalString = z.preprocess(
   (value) => (value === "" ? undefined : value),

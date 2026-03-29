@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { rm } from "node:fs/promises";
 import path from "node:path";
-import { clearEnvCache } from "@/lib/env";
+import { clearEnvCache, DEPLOYED_SUPABASE_CONFIG_ERROR } from "@/lib/env";
 import { generateDebateWorkspace } from "@/server/services/debate-generator";
 import { getDebateRepository } from "@/server/repositories/debate-repository";
 import type { DebateSetupInput } from "@/features/debates/types";
@@ -29,6 +29,7 @@ const baseSetup: DebateSetupInput = {
 };
 
 beforeEach(async () => {
+  vi.stubEnv("NODE_ENV", "test");
   vi.stubEnv("DATABASE_URL", "");
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "");
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "");
@@ -69,5 +70,14 @@ describe("debate repository", () => {
 
     expect(debates).toHaveLength(4);
     expect(new Set(debates.map((debate) => debate.id)).size).toBe(4);
+  });
+
+  it("blocks mock persistence in production without Supabase", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    clearEnvCache();
+
+    await expect(getDebateRepository()).rejects.toThrow(
+      DEPLOYED_SUPABASE_CONFIG_ERROR,
+    );
   });
 });

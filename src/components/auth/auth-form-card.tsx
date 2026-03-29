@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Loader2, MailCheck, Sparkles } from "lucide-react";
+import { canUseLocalWorkspaceMode, DEPLOYED_SUPABASE_CONFIG_ERROR } from "@/lib/runtime-mode";
 import { getSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,7 +24,11 @@ export function AuthFormCard({ mode }: { mode: Mode }) {
     setError(null);
 
     if (!supabase) {
-      setMessage("Supabase Auth is not configured in this environment. Use local workspace mode from the dashboard.");
+      setMessage(
+        canUseLocalWorkspaceMode()
+          ? "Supabase Auth is not configured in this environment. Use local workspace mode from the dashboard."
+          : DEPLOYED_SUPABASE_CONFIG_ERROR,
+      );
       return;
     }
 

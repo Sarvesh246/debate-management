@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentUserContext, isLocalMode } from "@/lib/auth";
+import { canUseLocalWorkspaceMode, isSupabaseConfigured } from "@/lib/env";
 import { getDebateRepository } from "@/server/repositories/debate-repository";
 
 export async function requireAppUser() {
@@ -26,5 +27,9 @@ export async function getDebateForCurrentUser(debateId: string) {
 }
 
 export function getAppModeLabel() {
+  if (!isSupabaseConfigured() && !canUseLocalWorkspaceMode()) {
+    return "Configuration required";
+  }
+
   return isLocalMode() ? "Local workspace mode" : "Authenticated workspace mode";
 }

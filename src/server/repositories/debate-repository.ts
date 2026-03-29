@@ -2,7 +2,11 @@ import { eq } from "drizzle-orm";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { nanoid } from "nanoid";
-import { isSupabaseConfigured } from "@/lib/env";
+import {
+  canUseLocalWorkspaceMode,
+  DEPLOYED_SUPABASE_CONFIG_ERROR,
+  isSupabaseConfigured,
+} from "@/lib/env";
 import type {
   DebateRunRecord,
   DebateWorkspaceRecord,
@@ -484,7 +488,13 @@ async function createDatabaseRepository(): Promise<DebateRepository> {
 }
 
 export async function getDebateRepository() {
-  return isSupabaseConfigured()
-    ? createDatabaseRepository()
-    : createMockRepository();
+  if (isSupabaseConfigured()) {
+    return createDatabaseRepository();
+  }
+
+  if (!canUseLocalWorkspaceMode()) {
+    throw new Error(DEPLOYED_SUPABASE_CONFIG_ERROR);
+  }
+
+  return createMockRepository();
 }

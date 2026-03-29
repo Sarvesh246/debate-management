@@ -136,6 +136,8 @@
 @layer base {
   html {
     @apply bg-background font-sans text-foreground;
+    /* Keeps focused/scrollIntoView targets clear of the sticky site header (mobile e2e + keyboard nav). */
+    scroll-padding-top: 5rem;
   }
 
   * {

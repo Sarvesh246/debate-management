@@ -68,7 +68,6 @@ export function DebateSetupWizard() {
     }
 
     router.push(`/debates/${payload.debateId}/overview`);
-    router.refresh();
   }
 
   return (

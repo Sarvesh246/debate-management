@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import { nanoid } from "nanoid";
 import { getDebateRepository } from "@/server/repositories/debate-repository";
@@ -11,6 +12,7 @@ export default async function DebatePrintPage({
   params: Promise<{ debateId: string }>;
   searchParams: Promise<{ kind?: string }>;
 }) {
+  await connection();
   const { debateId } = await params;
   const { kind = "packet" } = await searchParams;
   const user = await getCurrentUserContext();
