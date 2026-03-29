@@ -1,65 +1,142 @@
-import Image from "next/image";
+import Link from "next/link";
+import { ArrowRight, BrainCircuit, ShieldCheck, Sparkles, Swords } from "lucide-react";
+import { SiteHeader } from "@/components/layout/site-header";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+
+const features = [
+  "Resolution analysis and judge-facing framing",
+  "Evidence cards with trust labels and claim separation",
+  "Opponent simulation, rebuttals, and vulnerability scanning",
+  "Cross-ex prep, speech drafts, live mode, and judge mode",
+];
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+    <div className="min-h-screen bg-background">
+      <SiteHeader />
+      <main>
+        <section className="surface-grid overflow-hidden border-b border-border/70">
+          <div className="mx-auto grid max-w-7xl gap-12 px-4 py-18 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:py-24">
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
+              <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/8 px-4 py-2 text-sm text-primary">
+                <ShieldCheck className="size-4" />
+                Trustworthy debate prep with deterministic fallback
+              </div>
+              <div className="space-y-5">
+                <h1 className="max-w-4xl font-heading text-5xl leading-[1.02] tracking-tight text-balance sm:text-6xl">
+                  Debate Command is a debate operating system, not a generic chatbot.
+                </h1>
+                <p className="max-w-2xl text-lg leading-8 text-muted-foreground">
+                  Turn a resolution and two sides into a source-backed battle plan: criteria, framing, evidence cards, opponent case, rebuttals, speeches, judge view, and live-round prep.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <Button asChild size="lg" className="gap-2">
+                  <Link href="/debates/new">
+                    Start a debate
+                    <ArrowRight className="size-4" />
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" size="lg">
+                  <Link href="/dashboard">Open dashboard</Link>
+                </Button>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {features.map((feature) => (
+                  <div key={feature} className="rounded-2xl border border-border/70 bg-card/70 px-4 py-4 text-sm text-muted-foreground">
+                    {feature}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 lg:pl-6">
+              <Card className="overflow-hidden border-border/70 bg-card/80 shadow-2xl shadow-primary/10">
+                <CardHeader className="border-b border-border/70 bg-background/50">
+                  <CardTitle className="font-heading text-2xl">Sample round</CardTitle>
+                  <CardDescription>
+                    What is the best source of energy for the future? Natural gas vs Nuclear energy.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="grid gap-4 p-6">
+                  <Panel
+                    icon={<BrainCircuit className="size-4" />}
+                    title="What the debate is really about"
+                    body="Reliability, affordability, emissions, deployment speed, and long-run risk. The round turns on which criteria the judge values first."
+                  />
+                  <Panel
+                    icon={<Swords className="size-4" />}
+                    title="Key clash"
+                    body="Natural gas presses affordability and readiness. Nuclear presses reliability and emissions. The decisive move is how the framework orders near-term practicality versus long-run sustainability."
+                  />
+                  <Panel
+                    icon={<Sparkles className="size-4" />}
+                    title="Speaking-ready"
+                    body="Opening speech, rebuttal bank, cross-ex traps, live sheet, and judge mode all stay synced to the same evidence map."
+                  />
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
+          <div className="grid gap-6 lg:grid-cols-3">
+            <Card className="border-border/70 bg-card/75">
+              <CardHeader>
+                <CardTitle>How it works</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
+                <p>1. Define the resolution, sides, format, audience, and source strictness.</p>
+                <p>2. The app analyzes likely criteria, builds research queries, and gathers source-backed evidence.</p>
+                <p>3. It assembles arguments, rebuttals, speeches, judge analysis, and live-round materials.</p>
+              </CardContent>
+            </Card>
+            <Card className="border-border/70 bg-card/75">
+              <CardHeader>
+                <CardTitle>Trust model</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
+                <p>Factual claims stay linked to evidence cards.</p>
+                <p>Weak, stale, indirect, and unsupported points are labeled instead of hidden.</p>
+                <p>If providers fail, deterministic mode takes over instead of collapsing the workspace.</p>
+              </CardContent>
+            </Card>
+            <Card className="border-border/70 bg-card/75">
+              <CardHeader>
+                <CardTitle>Formats supported</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
+                <p>Classroom debate, Public Forum, Lincoln-Douglas-inspired rounds, policy-style structures, and short timed debates.</p>
+                <p>Each format profile changes framing emphasis, speech output, and practice prompts.</p>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
       </main>
+    </div>
+  );
+}
+
+function Panel({
+  icon,
+  title,
+  body,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  body: string;
+}) {
+  return (
+    <div className="rounded-2xl border border-border/70 bg-background/70 p-4">
+      <div className="mb-2 flex items-center gap-2 text-sm font-medium">
+        <span className="flex size-7 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          {icon}
+        </span>
+        {title}
+      </div>
+      <p className="text-sm leading-6 text-muted-foreground">{body}</p>
     </div>
   );
 }
