@@ -1,6 +1,10 @@
 import { redirect } from "next/navigation";
 import { getCurrentUserContext, isLocalMode } from "@/lib/auth";
-import { canUseLocalWorkspaceMode, isSupabaseConfigured } from "@/lib/env";
+import {
+  canUseLocalWorkspaceMode,
+  DEPLOYED_SUPABASE_CONFIG_ERROR,
+  isSupabaseConfigured,
+} from "@/lib/env";
 import { getDebateRepository } from "@/server/repositories/debate-repository";
 
 export async function requireAppUser() {
@@ -9,6 +13,12 @@ export async function requireAppUser() {
   } catch (error) {
     if (error instanceof Error && error.message === "AUTH_REQUIRED") {
       redirect("/login");
+    }
+    if (
+      error instanceof Error &&
+      error.message === DEPLOYED_SUPABASE_CONFIG_ERROR
+    ) {
+      redirect("/settings?setup=supabase");
     }
     throw error;
   }

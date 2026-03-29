@@ -1,10 +1,19 @@
+import { ShieldAlert } from "lucide-react";
 import { SiteHeader } from "@/components/layout/site-header";
 import { CapabilityHealthPanel } from "@/components/debate/client-panels";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getAppModeLabel } from "@/server/services/debate-access";
+import {
+  canUseLocalWorkspaceMode,
+  DEPLOYED_SUPABASE_CONFIG_ERROR,
+  isSupabaseConfigured,
+} from "@/lib/env";
 
 export default function SettingsPage() {
+  const needsSupabaseSetup =
+    !isSupabaseConfigured() && !canUseLocalWorkspaceMode();
+
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader appModeLabel={getAppModeLabel()} />
@@ -16,6 +25,32 @@ export default function SettingsPage() {
             Review which capabilities are active, confirm the current operating mode, and adjust local display preferences.
           </p>
         </div>
+
+        {needsSupabaseSetup ? (
+          <Card className="border-amber-500/25 bg-amber-500/10">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-amber-950 dark:text-amber-100">
+                <ShieldAlert className="size-5" />
+                Deployment setup required
+              </CardTitle>
+              <CardDescription className="text-amber-900/80 dark:text-amber-200/90">
+                {DEPLOYED_SUPABASE_CONFIG_ERROR}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-amber-950 dark:text-amber-100">
+              <p>
+                Add these environment variables in your hosting provider, then redeploy:
+              </p>
+              <div className="rounded-2xl border border-amber-500/20 bg-background/70 p-4 font-mono text-xs leading-6 text-foreground">
+                NEXT_PUBLIC_SUPABASE_URL
+                <br />
+                NEXT_PUBLIC_SUPABASE_ANON_KEY
+                <br />
+                DATABASE_URL
+              </div>
+            </CardContent>
+          </Card>
+        ) : null}
 
         <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
           <CapabilityHealthPanel />

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { nanoid } from "nanoid";
 import { getDebateRepository } from "@/server/repositories/debate-repository";
 import { hydrateExportPacket } from "@/server/services/debate-generator";
-import { getCurrentUserContext } from "@/lib/auth";
+import { requireAppUser } from "@/server/services/debate-access";
 
 export default async function DebatePrintPage({
   params,
@@ -15,7 +15,7 @@ export default async function DebatePrintPage({
   await connection();
   const { debateId } = await params;
   const { kind = "packet" } = await searchParams;
-  const user = await getCurrentUserContext();
+  const user = await requireAppUser();
   const repository = await getDebateRepository();
   const debate = await repository.getDebate(user.id, debateId);
   if (!debate) {
