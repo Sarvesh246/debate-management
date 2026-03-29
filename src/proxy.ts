@@ -32,7 +32,13 @@ export async function proxy(request: NextRequest) {
     },
   });
 
-  await supabase.auth.getUser();
+  try {
+    await supabase.auth.getUser();
+  } catch {
+    // Auth refresh failures should not crash navigation. Downstream routes can
+    // still redirect to /login or render setup guidance safely.
+    return NextResponse.next({ request });
+  }
   return response;
 }
 
