@@ -26,6 +26,7 @@
 .DS_Store
 *.pem
 /.data
+supabase.txt
 /.tmp-next-dev.log
 /.tmp-next-dev.err.log
 
