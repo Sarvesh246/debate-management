@@ -81,7 +81,7 @@ cp .env.example .env.local
 
 - `GEMINI_API_KEY`
 - `TAVILY_API_KEY`
-- `SEMANTIC_SCHOLAR_API_KEY`
+- `SEMANTIC_SCHOLAR_API_KEY` — retrieval still works without it (OpenAlex and Crossref are used). If you want a Semantic Scholar key, their signup flow typically requires an academic or institutional email address.
 
 5. Start the app
 
@@ -134,6 +134,12 @@ npm run test
 npm run test:e2e
 npm run check
 ```
+
+## npm install notes
+
+`package.json` includes an **`overrides`** entry for `encoding-sniffer` (^1.0.2) so Cheerio uses `@exodus/bytes` instead of the deprecated **`whatwg-encoding`** package.
+
+You may still see deprecation warnings from **dev-only** transitive dependencies: **`@esbuild-kit/*`** (pulled in by `drizzle-kit` until Drizzle Kit 1.x is stable) and **`node-domexception`** (via **`shadcn`**’s `node-fetch`). Those are upstream; upgrading Drizzle to the 1.0 line will require a migration when you are ready.
 
 ## Testing
 
