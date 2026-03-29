@@ -33,7 +33,7 @@ describe("requireAppUser", () => {
 
   it("redirects to settings when deployed auth config is missing", async () => {
     getCurrentUserContextMock.mockRejectedValue(
-      new Error(DEPLOYED_SUPABASE_CONFIG_ERROR),
+      new Error(`${DEPLOYED_SUPABASE_CONFIG_ERROR} Missing: DATABASE_URL.`),
     );
 
     await expect(requireAppUser()).rejects.toThrow("NEXT_REDIRECT");

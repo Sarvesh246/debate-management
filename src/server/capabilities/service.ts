@@ -1,6 +1,7 @@
 import {
   canUseLocalWorkspaceMode,
   getEnv,
+  getMissingSupabaseServerEnvNames,
   isGeminiConfigured,
   isSupabaseConfigured,
   isTavilyConfigured,
@@ -17,6 +18,7 @@ function createDescriptor(
 
 export function getCapabilitySnapshot(): CapabilitySnapshot {
   const hasSupabase = isSupabaseConfigured();
+  const missingSupabaseEnvNames = getMissingSupabaseServerEnvNames();
   const localWorkspaceModeAvailable = canUseLocalWorkspaceMode();
   const hasGemini = isGeminiConfigured();
   const hasTavily = isTavilyConfigured();
@@ -34,7 +36,7 @@ export function getCapabilitySnapshot(): CapabilitySnapshot {
         : createDescriptor(
             "Auth",
             "unavailable",
-            "Supabase Auth is required in deployed environments.",
+            `Supabase Auth is required in deployed environments. Missing: ${missingSupabaseEnvNames.join(", ")}.`,
           ),
     persistence: hasSupabase
       ? createDescriptor("Persistence", "ready", "Supabase Postgres is configured.")
@@ -47,7 +49,7 @@ export function getCapabilitySnapshot(): CapabilitySnapshot {
         : createDescriptor(
             "Persistence",
             "unavailable",
-            "Supabase Postgres is required in deployed environments.",
+            `Supabase Postgres is required in deployed environments. Missing: ${missingSupabaseEnvNames.join(", ")}.`,
           ),
     publicRetrieval: createDescriptor(
       "Public retrieval",

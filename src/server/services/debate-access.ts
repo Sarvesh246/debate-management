@@ -16,7 +16,7 @@ export async function requireAppUser() {
     }
     if (
       error instanceof Error &&
-      error.message === DEPLOYED_SUPABASE_CONFIG_ERROR
+      error.message.startsWith(DEPLOYED_SUPABASE_CONFIG_ERROR)
     ) {
       redirect("/settings?setup=supabase");
     }

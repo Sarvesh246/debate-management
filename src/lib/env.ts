@@ -51,13 +51,47 @@ export function clearEnvCache() {
   cachedEnv = null;
 }
 
-export function isSupabaseConfigured() {
+export function getSupabaseEnvPresence() {
   const env = getEnv();
-  return Boolean(
-    env.NEXT_PUBLIC_SUPABASE_URL &&
-      env.NEXT_PUBLIC_SUPABASE_ANON_KEY &&
-      env.DATABASE_URL,
-  );
+  return {
+    supabaseUrl: Boolean(env.NEXT_PUBLIC_SUPABASE_URL),
+    supabaseAnonKey: Boolean(env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
+    databaseUrl: Boolean(env.DATABASE_URL),
+  };
+}
+
+export function getMissingSupabaseServerEnvNames() {
+  const presence = getSupabaseEnvPresence();
+  return [
+    !presence.supabaseUrl ? "NEXT_PUBLIC_SUPABASE_URL" : null,
+    !presence.supabaseAnonKey ? "NEXT_PUBLIC_SUPABASE_ANON_KEY" : null,
+    !presence.databaseUrl ? "DATABASE_URL" : null,
+  ].filter(Boolean) as string[];
+}
+
+export function getMissingSupabaseBrowserEnvNames() {
+  const presence = getSupabaseEnvPresence();
+  return [
+    !presence.supabaseUrl ? "NEXT_PUBLIC_SUPABASE_URL" : null,
+    !presence.supabaseAnonKey ? "NEXT_PUBLIC_SUPABASE_ANON_KEY" : null,
+  ].filter(Boolean) as string[];
+}
+
+export function isSupabaseConfigured() {
+  return getMissingSupabaseServerEnvNames().length === 0;
+}
+
+export function isSupabaseBrowserConfigured() {
+  return getMissingSupabaseBrowserEnvNames().length === 0;
+}
+
+export function getSupabaseServerConfigError() {
+  const missing = getMissingSupabaseServerEnvNames();
+  if (missing.length === 0) {
+    return undefined;
+  }
+
+  return `Supabase is required in deployed environments. Missing: ${missing.join(", ")}.`;
 }
 
 export function isGeminiConfigured() {

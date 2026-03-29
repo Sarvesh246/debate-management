@@ -7,12 +7,14 @@ import { getAppModeLabel } from "@/server/services/debate-access";
 import {
   canUseLocalWorkspaceMode,
   DEPLOYED_SUPABASE_CONFIG_ERROR,
+  getMissingSupabaseServerEnvNames,
   isSupabaseConfigured,
 } from "@/lib/env";
 
 export default function SettingsPage() {
   const needsSupabaseSetup =
     !isSupabaseConfigured() && !canUseLocalWorkspaceMode();
+  const missingSupabaseEnvNames = getMissingSupabaseServerEnvNames();
 
   return (
     <div className="min-h-screen bg-background">
@@ -39,15 +41,14 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent className="space-y-3 text-sm text-amber-950 dark:text-amber-100">
               <p>
-                Add these environment variables in your hosting provider, then redeploy:
+                The deployment still cannot see these variables:
               </p>
               <div className="rounded-2xl border border-amber-500/20 bg-background/70 p-4 font-mono text-xs leading-6 text-foreground">
-                NEXT_PUBLIC_SUPABASE_URL
-                <br />
-                NEXT_PUBLIC_SUPABASE_ANON_KEY
-                <br />
-                DATABASE_URL
+                {missingSupabaseEnvNames.map((name) => (
+                  <div key={name}>{name}</div>
+                ))}
               </div>
+              <p>Add them to this Vercel project, not just the team store, then redeploy.</p>
             </CardContent>
           </Card>
         ) : null}
