@@ -37,7 +37,14 @@ export const getCurrentUserContext = cache(async (): Promise<UserContext> => {
     };
   }
 
-  const { data, error } = await supabase.auth.getUser();
+  let result: Awaited<ReturnType<typeof supabase.auth.getUser>>;
+  try {
+    result = await supabase.auth.getUser();
+  } catch {
+    // Network / transient failures from the Auth API should not crash RSC — treat as signed out.
+    throw new Error("AUTH_REQUIRED");
+  }
+  const { data, error } = result;
 
   // Never destructure `data: { user }` directly — when `error` is set, `data` can be null and
   // that pattern throws, surfacing as a generic RSC error (common on Vercel when the session is invalid).

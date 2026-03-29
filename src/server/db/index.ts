@@ -11,9 +11,17 @@ export function getDb() {
   }
 
   if (!dbInstance) {
-    const connection = postgres(getEnv().DATABASE_URL!, {
+    const databaseUrl = getEnv().DATABASE_URL!;
+    const isLocalHost =
+      databaseUrl.includes("127.0.0.1") ||
+      databaseUrl.includes("localhost") ||
+      databaseUrl.includes("host.docker.internal");
+
+    const connection = postgres(databaseUrl, {
       prepare: false,
       max: 1,
+      // Supabase / hosted Postgres require TLS; local dev often does not.
+      ...(isLocalHost ? {} : { ssl: "require" as const }),
     });
     dbInstance = drizzle(connection, { schema });
   }
