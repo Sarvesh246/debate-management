@@ -1,12 +1,11 @@
 import { redirect } from "next/navigation";
 import { getCurrentUserContext, isLocalMode } from "@/lib/auth";
-import {
-  canUseLocalWorkspaceMode,
-  DEPLOYED_SUPABASE_CONFIG_ERROR,
-  isSupabaseConfigured,
-} from "@/lib/env";
+import { canUseLocalWorkspaceMode, isSupabaseConfigured } from "@/lib/env";
 import { getDatabaseFailureKind } from "@/server/db/errors";
 import { getDebateRepository } from "@/server/repositories/debate-repository";
+
+/** Prefix shared by getSupabaseServerConfigError() ("Missing: …") and DEPLOYED_SUPABASE_CONFIG_ERROR ("Set …"). */
+const SUPABASE_DEPLOYMENT_ERROR_PREFIX = "Supabase is required in deployed environments";
 
 export async function requireAppUser() {
   try {
@@ -17,7 +16,7 @@ export async function requireAppUser() {
     }
     if (
       error instanceof Error &&
-      error.message.startsWith(DEPLOYED_SUPABASE_CONFIG_ERROR)
+      error.message.startsWith(SUPABASE_DEPLOYMENT_ERROR_PREFIX)
     ) {
       redirect("/settings?setup=supabase");
     }

@@ -37,13 +37,15 @@ export const getCurrentUserContext = cache(async (): Promise<UserContext> => {
     };
   }
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data, error } = await supabase.auth.getUser();
 
-  if (!user) {
+  // Never destructure `data: { user }` directly — when `error` is set, `data` can be null and
+  // that pattern throws, surfacing as a generic RSC error (common on Vercel when the session is invalid).
+  if (error || !data?.user) {
     throw new Error("AUTH_REQUIRED");
   }
+
+  const user = data.user;
 
   return {
     id: user.id,

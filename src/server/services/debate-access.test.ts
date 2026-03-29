@@ -1,5 +1,4 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { DEPLOYED_SUPABASE_CONFIG_ERROR } from "@/lib/env";
 
 const redirectMock = vi.fn(() => {
   throw new Error("NEXT_REDIRECT");
@@ -31,9 +30,20 @@ describe("requireAppUser", () => {
     expect(redirectMock).toHaveBeenCalledWith("/login");
   });
 
-  it("redirects to settings when deployed auth config is missing", async () => {
+  it("redirects to settings when deployed auth config is missing (Missing: …)", async () => {
     getCurrentUserContextMock.mockRejectedValue(
-      new Error(`${DEPLOYED_SUPABASE_CONFIG_ERROR} Missing: DATABASE_URL.`),
+      new Error("Supabase is required in deployed environments. Missing: DATABASE_URL."),
+    );
+
+    await expect(requireAppUser()).rejects.toThrow("NEXT_REDIRECT");
+    expect(redirectMock).toHaveBeenCalledWith("/settings?setup=supabase");
+  });
+
+  it("redirects to settings when deployed auth config is missing (Set …)", async () => {
+    getCurrentUserContextMock.mockRejectedValue(
+      new Error(
+        "Supabase is required in deployed environments. Set NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, and DATABASE_URL.",
+      ),
     );
 
     await expect(requireAppUser()).rejects.toThrow("NEXT_REDIRECT");
