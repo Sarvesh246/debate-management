@@ -1,0 +1,56 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e4]:
+    - banner [ref=e5]:
+      - generic [ref=e6]:
+        - link "Debate Command Debate intelligence platform" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - img [ref=e9]
+          - generic [ref=e11]:
+            - generic [ref=e12]: Debate Command
+            - generic [ref=e13]: Debate intelligence platform
+        - navigation [ref=e14]:
+          - link "Dashboard" [ref=e15] [cursor=pointer]:
+            - /url: /dashboard
+            - img
+            - text: Dashboard
+          - link "Start a debate" [ref=e16] [cursor=pointer]:
+            - /url: /debates/new
+          - link "Settings" [ref=e17] [cursor=pointer]:
+            - /url: /settings
+            - img
+            - text: Settings
+        - generic [ref=e18]:
+          - button "Toggle theme" [ref=e19]:
+            - img
+            - text: Light
+          - generic [ref=e20]:
+            - link "Log in" [ref=e21] [cursor=pointer]:
+              - /url: /login
+            - link "Sign up" [ref=e22] [cursor=pointer]:
+              - /url: /signup
+    - main [ref=e23]:
+      - generic [ref=e24]:
+        - generic [ref=e25]:
+          - paragraph [ref=e26]: New debate
+          - heading "Start fast. Let the system build the rest in stages." [level=1] [ref=e27]
+          - paragraph [ref=e28]: Enter the resolution and sides first. Debate Command will build the round brief, retrieve and score evidence, assemble arguments, stress-test rebuttals, and prepare the live packet in a cleaner command-center flow. If provider-backed synthesis is unavailable, the deterministic engine takes over automatically.
+        - generic [ref=e29]:
+          - generic [ref=e30]: After you submit
+          - generic [ref=e31]:
+            - paragraph [ref=e32]: 1. We clarify the round and rank the decision criteria.
+            - paragraph [ref=e33]: 2. We retrieve sources and show the trust picture.
+            - paragraph [ref=e34]: 3. We build your case, rebuttals, and live packet in order.
+      - generic [ref=e35]:
+        - generic [ref=e36]:
+          - generic [ref=e37]: Sign in required
+          - heading "Log in before you build a saved debate workspace." [level=3] [ref=e38]
+          - generic [ref=e39]: The public marketing pages are open, but creating and saving a debate workspace uses your authenticated account. Log in or create an account, then come back here to start the build flow.
+        - generic [ref=e40]:
+          - link "Log in" [ref=e41] [cursor=pointer]:
+            - /url: /login
+          - link "Create account" [ref=e42] [cursor=pointer]:
+            - /url: /signup
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e48] [cursor=pointer]:
+    - img [ref=e49]
+  - alert [ref=e52]

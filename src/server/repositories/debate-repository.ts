@@ -12,7 +12,9 @@ import type {
   DebateWorkspaceRecord,
   ExportRecord,
   PracticeSessionRecord,
+  WorkspaceOverlay,
 } from "@/features/debates/types";
+import { normalizeWorkspaceOverlay } from "@/features/debates/workspace-overlay";
 import { getDb } from "@/server/db";
 import {
   argumentEvidenceLinks,
@@ -80,6 +82,11 @@ export interface DebateRepository {
   listDebates(userId: string): Promise<DebateWorkspaceRecord[]>;
   getDebate(userId: string, debateId: string): Promise<DebateWorkspaceRecord | null>;
   saveDebate(record: DebateWorkspaceRecord, run?: DebateRunRecord): Promise<void>;
+  updateWorkspaceOverlay(
+    userId: string,
+    debateId: string,
+    overlay: WorkspaceOverlay,
+  ): Promise<DebateWorkspaceRecord | null>;
   savePracticeSession(record: PracticeSessionRecord): Promise<void>;
   listPracticeSessions(debateId: string): Promise<PracticeSessionRecord[]>;
   saveExportRecord(record: ExportRecord): Promise<void>;
@@ -89,6 +96,16 @@ export function buildDebateScopedRowId(debateId: string, localId: string) {
   return `${debateId}:${localId}`;
 }
 
+function withNormalizedOverlay(record: DebateWorkspaceRecord): DebateWorkspaceRecord {
+  return {
+    ...record,
+    workspaceOverlay: normalizeWorkspaceOverlay(
+      record.workspaceOverlay,
+      record.workspaceSnapshot,
+    ),
+  };
+}
+
 async function createMockRepository(): Promise<DebateRepository> {
   return {
     async listDebates(userId) {
@@ -96,15 +113,16 @@ async function createMockRepository(): Promise<DebateRepository> {
       const store = await ensureMockStore();
       return store.debates
         .filter((debate) => debate.userId === userId)
+        .map(withNormalizedOverlay)
         .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
     },
     async getDebate(userId, debateId) {
       await waitForMockStoreIdle();
       const store = await ensureMockStore();
       return (
-        store.debates.find(
-          (debate) => debate.id === debateId && debate.userId === userId,
-        ) ?? null
+        store.debates
+          .filter((debate) => debate.id === debateId && debate.userId === userId)
+          .map(withNormalizedOverlay)[0] ?? null
       );
     },
     async saveDebate(record, run) {
@@ -112,14 +130,38 @@ async function createMockRepository(): Promise<DebateRepository> {
         const store = await ensureMockStore();
         const index = store.debates.findIndex((debate) => debate.id === record.id);
         if (index >= 0) {
-          store.debates[index] = record;
+          store.debates[index] = withNormalizedOverlay(record);
         } else {
-          store.debates.push(record);
+          store.debates.push(withNormalizedOverlay(record));
         }
         if (run) {
           store.debateRuns.push(run);
         }
         await persistMockStore(store);
+      });
+    },
+    async updateWorkspaceOverlay(userId, debateId, overlay) {
+      return withMockStoreLock(async () => {
+        const store = await ensureMockStore();
+        const index = store.debates.findIndex(
+          (debate) => debate.id === debateId && debate.userId === userId,
+        );
+        if (index < 0) {
+          return null;
+        }
+
+        const current = withNormalizedOverlay(store.debates[index]!);
+        const next = {
+          ...current,
+          workspaceOverlay: normalizeWorkspaceOverlay(
+            overlay,
+            current.workspaceSnapshot,
+          ),
+          updatedAt: new Date().toISOString(),
+        };
+        store.debates[index] = next;
+        await persistMockStore(store);
+        return next;
       });
     },
     async savePracticeSession(record) {
@@ -151,7 +193,7 @@ async function createDatabaseRepository(): Promise<DebateRepository> {
   }
 
   function mapRowToRecord(row: typeof debateWorkspaces.$inferSelect): DebateWorkspaceRecord {
-    return {
+    return withNormalizedOverlay({
       id: row.id,
       userId: row.userId,
       title: row.title,
@@ -171,9 +213,10 @@ async function createDatabaseRepository(): Promise<DebateRepository> {
       providerStatus: row.providerStatus as DebateWorkspaceRecord["providerStatus"],
       degradationReason: row.degradationReason ?? undefined,
       workspaceSnapshot: row.workspaceSnapshot,
+      workspaceOverlay: row.workspaceOverlay,
       createdAt: row.createdAt.toISOString(),
       updatedAt: row.updatedAt.toISOString(),
-    };
+    });
   }
 
   return {
@@ -221,6 +264,10 @@ async function createDatabaseRepository(): Promise<DebateRepository> {
             providerStatus: record.providerStatus,
             degradationReason: record.degradationReason,
             workspaceSnapshot: record.workspaceSnapshot,
+            workspaceOverlay: normalizeWorkspaceOverlay(
+              record.workspaceOverlay,
+              record.workspaceSnapshot,
+            ),
             createdAt: new Date(record.createdAt),
             updatedAt: new Date(record.updatedAt),
           })
@@ -244,6 +291,10 @@ async function createDatabaseRepository(): Promise<DebateRepository> {
               providerStatus: record.providerStatus,
               degradationReason: record.degradationReason,
               workspaceSnapshot: record.workspaceSnapshot,
+              workspaceOverlay: normalizeWorkspaceOverlay(
+                record.workspaceOverlay,
+                record.workspaceSnapshot,
+              ),
               updatedAt: new Date(record.updatedAt),
             },
           });
@@ -486,6 +537,31 @@ async function createDatabaseRepository(): Promise<DebateRepository> {
         format: record.format,
         fileUrl: record.fileUrl,
         createdAt: new Date(record.createdAt),
+      });
+    },
+    async updateWorkspaceOverlay(userId, debateId, overlay) {
+      const [current] = await db
+        .select()
+        .from(debateWorkspaces)
+        .where(eq(debateWorkspaces.id, debateId));
+
+      if (!current || current.userId !== userId) {
+        return null;
+      }
+
+      const normalized = normalizeWorkspaceOverlay(overlay, current.workspaceSnapshot);
+      await db
+        .update(debateWorkspaces)
+        .set({
+          workspaceOverlay: normalized,
+          updatedAt: new Date(),
+        })
+        .where(eq(debateWorkspaces.id, debateId));
+
+      return mapRowToRecord({
+        ...current,
+        workspaceOverlay: normalized,
+        updatedAt: new Date(),
       });
     },
   };

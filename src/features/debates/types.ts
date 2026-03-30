@@ -24,7 +24,28 @@ export const sourcePreferenceModes = [
   "teacher_safe_only",
 ] as const;
 
-export const workspaceSections = [
+export const primaryWorkspacePillars = [
+  "understand",
+  "build",
+  "practice",
+  "live",
+] as const;
+
+export const secondaryWorkspaceTools = [
+  "sources",
+  "judge",
+  "export",
+] as const;
+
+export const buildModules = [
+  "case",
+  "opponent",
+  "vulnerabilities",
+  "cross_ex",
+  "speeches",
+] as const;
+
+export const legacyWorkspaceSections = [
   "overview",
   "strategy",
   "arguments",
@@ -33,10 +54,10 @@ export const workspaceSections = [
   "vulnerabilities",
   "cross-ex",
   "speech-builder",
+  "practice",
   "live",
   "sources",
   "judge",
-  "practice",
   "export",
 ] as const;
 
@@ -45,7 +66,10 @@ export type AudienceLevel = (typeof audienceLevels)[number];
 export type ObjectiveMode = (typeof objectiveModes)[number];
 export type TrustMode = (typeof trustModes)[number];
 export type SourcePreferenceMode = (typeof sourcePreferenceModes)[number];
-export type WorkspaceSection = (typeof workspaceSections)[number];
+export type WorkspacePillar = (typeof primaryWorkspacePillars)[number];
+export type WorkspaceTool = (typeof secondaryWorkspaceTools)[number];
+export type BuildModule = (typeof buildModules)[number];
+export type LegacyWorkspaceSection = (typeof legacyWorkspaceSections)[number];
 
 export type ProviderStatus = "ready" | "degraded" | "unavailable";
 export type GenerationMode = "provider" | "deterministic";
@@ -278,6 +302,21 @@ export interface PracticePlan {
   provenance: Provenance;
 }
 
+export interface WorkspaceOverlay {
+  pinnedArgumentIds: string[];
+  pinnedRebuttalIds: string[];
+  selectedWinningPath: string | null;
+  speechEdits: Partial<Record<SpeechDraft["type"], string>>;
+  notes: Partial<Record<BuildModule | WorkspacePillar, string>>;
+  simplifiedPhrasing: Record<string, string>;
+  liveSheetOrder: {
+    argumentIds: string[];
+    rebuttalIds: string[];
+    trapQuestionIds: string[];
+  };
+  moduleState: Partial<Record<BuildModule, { collapsed: boolean; pinned: boolean }>>;
+}
+
 export interface DebateAnalysis {
   whatThisDebateIsReallyAbout: string;
   keyTerms: string[];
@@ -340,6 +379,7 @@ export interface DebateWorkspaceRecord {
   providerStatus: ProviderStatus;
   degradationReason?: string;
   workspaceSnapshot: DebateWorkspaceSnapshot;
+  workspaceOverlay: WorkspaceOverlay;
   createdAt: string;
   updatedAt: string;
 }

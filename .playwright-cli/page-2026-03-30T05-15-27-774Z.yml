@@ -1,0 +1,137 @@
+- generic [ref=e1]:
+  - generic [ref=e4]:
+    - banner [ref=e5]:
+      - generic [ref=e6]:
+        - link "Debate Command Debate intelligence platform" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - img [ref=e9]
+          - generic [ref=e11]:
+            - generic [ref=e12]: Debate Command
+            - generic [ref=e13]: Debate intelligence platform
+        - navigation [ref=e14]:
+          - link "Dashboard" [ref=e15] [cursor=pointer]:
+            - /url: /dashboard
+            - img
+            - text: Dashboard
+          - link "Start a debate" [ref=e16] [cursor=pointer]:
+            - /url: /debates/new
+          - link "Settings" [ref=e17] [cursor=pointer]:
+            - /url: /settings
+            - img
+            - text: Settings
+        - generic [ref=e18]:
+          - button "Toggle theme" [ref=e19]:
+            - img
+            - text: Light
+          - generic [ref=e20]:
+            - link "Log in" [ref=e21] [cursor=pointer]:
+              - /url: /login
+            - link "Sign up" [ref=e22] [cursor=pointer]:
+              - /url: /signup
+    - main [ref=e23]:
+      - generic [ref=e24]:
+        - generic [ref=e25]:
+          - paragraph [ref=e26]: New debate
+          - heading "Start fast. Let the system build the rest in stages." [level=1] [ref=e27]
+          - paragraph [ref=e28]: Enter the resolution and sides first. Debate Command will build the round brief, retrieve and score evidence, assemble arguments, stress-test rebuttals, and prepare the live packet in a cleaner command-center flow. If provider-backed synthesis is unavailable, the deterministic engine takes over automatically.
+        - generic [ref=e29]:
+          - generic [ref=e30]: After you submit
+          - generic [ref=e31]:
+            - paragraph [ref=e32]: 1. We clarify the round and rank the decision criteria.
+            - paragraph [ref=e33]: 2. We retrieve sources and show the trust picture.
+            - paragraph [ref=e34]: 3. We build your case, rebuttals, and live packet in order.
+      - generic [ref=e35]:
+        - generic [ref=e36]:
+          - generic [ref=e37]:
+            - paragraph [ref=e38]: Quick setup
+            - heading "Start with the round, not the settings." [level=2] [ref=e39]
+            - paragraph [ref=e40]: Enter the resolution, pick both sides, and choose your goal. Everything else can stay on the defaults until you need more control.
+          - generic [ref=e41]:
+            - generic [ref=e42]:
+              - generic [ref=e43]:
+                - generic [ref=e44]: Resolution
+                - textbox "Resolution" [ref=e45]:
+                  - /placeholder: What is the resolution or debate question?
+              - generic [ref=e46]:
+                - generic [ref=e47]:
+                  - generic [ref=e48]: My side
+                  - textbox "My side" [ref=e49]:
+                    - /placeholder: What side are you defending?
+                - generic [ref=e50]:
+                  - generic [ref=e51]: Opponent side
+                  - textbox "Opponent side" [ref=e52]:
+                    - /placeholder: What side are they defending?
+              - generic [ref=e53]:
+                - generic [ref=e54]: Objective
+                - combobox [ref=e55]:
+                  - img
+                - combobox [ref=e56]
+            - generic [ref=e57]:
+              - generic [ref=e58]:
+                - generic [ref=e59]:
+                  - generic [ref=e60]: Current defaults
+                  - paragraph [ref=e61]: These settings guide sourcing, speeches, and the live packet. Open advanced settings only if you need to override them.
+                - button "Advanced settings" [active] [ref=e62]:
+                  - text: Advanced settings
+                  - img
+              - generic [ref=e63]:
+                - generic [ref=e64]:
+                  - generic [ref=e65]: "Format:"
+                  - text: classroom
+                - generic [ref=e66]:
+                  - generic [ref=e67]: "Audience:"
+                  - text: high school
+                - generic [ref=e68]:
+                  - generic [ref=e69]: "Timing:"
+                  - text: 3/2/2 min
+                - generic [ref=e70]:
+                  - generic [ref=e71]: "Trust:"
+                  - text: teacher safe
+                - generic [ref=e72]:
+                  - generic [ref=e73]: "Sources:"
+                  - text: mixed reputable
+            - generic [ref=e74]:
+              - paragraph [ref=e75]: You can refine sources, notes, speeches, and live-ordering after the workspace is built.
+              - button "Build workspace" [ref=e76]
+        - complementary [ref=e77]:
+          - generic [ref=e78]:
+            - generic [ref=e79]:
+              - heading "What happens next" [level=3] [ref=e80]
+              - generic [ref=e81]: The system will guide you through a staged build flow before opening the full command center.
+            - generic [ref=e82]:
+              - generic [ref=e83]:
+                - generic [ref=e84]:
+                  - img [ref=e86]
+                  - text: 1. Understand the round
+                - paragraph [ref=e90]: Extract the real clash, the strongest criteria, and the framework that favors your side.
+              - generic [ref=e91]:
+                - generic [ref=e92]:
+                  - img [ref=e94]
+                  - text: 2. Gather evidence
+                - paragraph [ref=e97]: Pull sources with trust labels, then turn the best support into usable evidence cards.
+              - generic [ref=e98]:
+                - generic [ref=e99]:
+                  - img [ref=e101]
+                  - text: 3. Build the case
+                - paragraph [ref=e108]: Assemble your arguments, likely opponent case, rebuttals, vulnerabilities, and cross-ex prep.
+              - generic [ref=e109]:
+                - generic [ref=e110]:
+                  - img [ref=e112]
+                  - text: 4. Get ready to speak
+                - paragraph [ref=e114]: Generate speech drafts, practice prompts, and a mobile-first live sheet without losing citations.
+          - generic [ref=e115]:
+            - heading "Current round summary" [level=3] [ref=e117]
+            - generic [ref=e118]:
+              - generic [ref=e119]:
+                - generic [ref=e120]: Resolution
+                - generic [ref=e121]: What is the best source of energy for the future?
+              - generic [ref=e122]:
+                - generic [ref=e123]: Sides
+                - generic [ref=e124]: Natural gas vs Nuclear energy
+              - generic [ref=e125]:
+                - generic [ref=e126]: Goal
+                - generic [ref=e127]: win
+              - generic [ref=e128]:
+                - generic [ref=e129]: Defaults
+                - generic [ref=e130]: classroom • high school
+  - region "Notifications alt+T"

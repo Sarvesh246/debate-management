@@ -96,7 +96,7 @@ export default async function DashboardPage() {
                 debates.map((debate) => (
                   <Link
                     key={debate.id}
-                    href={`/debates/${debate.id}/overview`}
+                    href={`/debates/${debate.id}/understand`}
                     className="rounded-3xl border border-border/70 bg-background/60 p-5 transition hover:border-primary/30 hover:bg-background"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-3">
@@ -110,9 +110,9 @@ export default async function DashboardPage() {
                     </div>
                     <div className="mt-4 flex flex-wrap gap-2 text-xs text-muted-foreground">
                       <span>{debate.format.replaceAll("_", " ")}</span>
-                      <span>•</span>
+                      <span>&bull;</span>
                       <span>{debate.audienceLevel.replaceAll("_", " ")}</span>
-                      <span>•</span>
+                      <span>&bull;</span>
                       <span>{new Date(debate.updatedAt).toLocaleString()}</span>
                     </div>
                   </Link>
@@ -152,7 +152,8 @@ export default async function DashboardPage() {
               <div className="rounded-2xl border border-border/70 bg-primary/8 px-4 py-4">
                 <div className="mb-1 font-medium text-foreground">Deterministic fallback</div>
                 <p className="text-sm">
-                  Even without a model key, the app still builds criteria, evidence cards, rebuttals, speeches, and practice prompts.
+                  Even without a model key, the app still builds criteria, evidence cards, rebuttals, speeches, and
+                  practice prompts.
                 </p>
               </div>
             </CardContent>

@@ -23,6 +23,26 @@ export interface ModelEnhancementResult {
   degradationReason?: string;
 }
 
+function formatModelEnhancementFailure(error: unknown): string {
+  const message = error instanceof Error ? error.message : "";
+  const statusMatch = message.match(/\bfailed with (\d+)\b/);
+  const status = statusMatch ? Number(statusMatch[1]) : NaN;
+
+  if (status === 429) {
+    return "Google Gemini rate-limited this request (HTTP 429). Wait a few minutes, confirm your quota or billing, then use Regenerate to try provider enhancement again.";
+  }
+  if (status === 401 || status === 403) {
+    return "Gemini rejected the request (HTTP 401/403). Check that GEMINI_API_KEY is valid and has access to the Generative Language API.";
+  }
+  if (status >= 500 && status < 600) {
+    return "Gemini returned a server error. Your workspace is complete with deterministic content; retry later with Regenerate if you want model polish.";
+  }
+  if (message) {
+    return message;
+  }
+  return "Provider enhancement failed before returning structured output.";
+}
+
 async function callGeminiStructured(prompt: string) {
   const env = getEnv();
   const response = await fetch(
@@ -70,7 +90,7 @@ export async function enhanceSnapshotWithModel(
       snapshot,
       generationMode: "deterministic",
       providerStatus: "degraded",
-      degradationReason: "No Gemini API key configured. Deterministic mode remained active.",
+      degradationReason: "No Gemini API key is configured; this workspace uses the deterministic engine only.",
     };
   }
 
@@ -139,10 +159,7 @@ ${snapshot.rebuttals.slice(0, 3).map((item) => `- ${item.shortRebuttal}`).join("
       snapshot,
       generationMode: "deterministic",
       providerStatus: "degraded",
-      degradationReason:
-        error instanceof Error
-          ? `${error.message} Deterministic mode was preserved.`
-          : "Provider enhancement failed. Deterministic mode was preserved.",
+      degradationReason: formatModelEnhancementFailure(error),
     };
   }
 }

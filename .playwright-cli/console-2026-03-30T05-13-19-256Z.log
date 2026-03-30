@@ -1,0 +1,6 @@
+Total messages: 4 (Errors: 2, Warnings: 0)
+
+[INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://127.0.0.1:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://127.0.0.1:3000/login:0
+[ERROR] WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=pc8E9Ugf72hX9HDxPyhMr' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE @ http://127.0.0.1:3000/_next/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13299
+[ERROR] WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=pc8E9Ugf72hX9HDxPyhMr' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE @ http://127.0.0.1:3000/_next/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13299

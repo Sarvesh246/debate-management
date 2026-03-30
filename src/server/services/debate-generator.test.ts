@@ -55,6 +55,26 @@ describe("debate generator", () => {
     const result = await generateDebateWorkspace(setup, "local-user");
 
     expect(result.record.generationMode).toBe("deterministic");
-    expect(result.record.degradationReason).toContain("Deterministic mode");
+    expect(result.record.degradationReason).toMatch(/Gemini|server error|retry/i);
+  });
+
+  it("maps Gemini 429 to a rate-limit explanation", async () => {
+    vi.stubEnv("GEMINI_API_KEY", "key");
+    clearEnvCache();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: string | URL) => {
+        if (String(input).includes("googleapis")) {
+          return new Response("{}", { status: 429 });
+        }
+        return new Response(JSON.stringify({ results: [] }), { status: 200 });
+      }) as typeof fetch,
+    );
+
+    const result = await generateDebateWorkspace(setup, "local-user");
+
+    expect(result.record.generationMode).toBe("deterministic");
+    expect(result.record.degradationReason).toMatch(/429/);
+    expect(result.record.degradationReason).toMatch(/rate-limited|quota/i);
   });
 });

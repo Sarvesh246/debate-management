@@ -1,5 +1,12 @@
 import { nanoid } from "nanoid";
 import { buildResearchQueries, buildWorkspaceSnapshot } from "@/features/debates/deterministic-engine";
+import {
+  getEffectiveLiveArguments,
+  getEffectiveLiveRebuttals,
+  getEffectiveSpeechContent,
+  getEffectiveTrapQuestions,
+  normalizeWorkspaceOverlay,
+} from "@/features/debates/workspace-overlay";
 import { getDegradationReason } from "@/server/capabilities/service";
 import { enhanceSnapshotWithModel } from "@/server/providers/model";
 import { discoverSources } from "@/server/providers/search";
@@ -7,7 +14,6 @@ import type {
   DebateRunRecord,
   DebateSetupInput,
   DebateWorkspaceRecord,
-  DebateWorkspaceSnapshot,
 } from "@/features/debates/types";
 
 function createTitle(input: DebateSetupInput) {
@@ -54,6 +60,7 @@ export async function generateDebateWorkspace(
     providerStatus: enhancement.providerStatus,
     degradationReason: enhancement.degradationReason ?? getDegradationReason(),
     workspaceSnapshot: enhancement.snapshot,
+    workspaceOverlay: normalizeWorkspaceOverlay(undefined, enhancement.snapshot),
     createdAt: now,
     updatedAt: now,
   };
@@ -72,19 +79,39 @@ export async function generateDebateWorkspace(
   return { record, run };
 }
 
-export function hydrateExportPacket(snapshot: DebateWorkspaceSnapshot) {
+export function hydrateExportPacket(record: DebateWorkspaceRecord) {
+  const overlay = normalizeWorkspaceOverlay(
+    record.workspaceOverlay,
+    record.workspaceSnapshot,
+  );
+  const workingRecord = {
+    ...record,
+    workspaceOverlay: overlay,
+  };
+
   return {
-    overview: snapshot.analysis,
-    strategy: snapshot.framing,
-    arguments: snapshot.myArguments,
-    opponent: snapshot.opponentArguments,
-    rebuttals: snapshot.rebuttals,
-    vulnerabilities: snapshot.vulnerabilities,
-    crossExam: snapshot.crossExam,
-    speeches: snapshot.speechDrafts,
-    live: snapshot.liveSheet,
-    judge: snapshot.judgeSummary,
-    sources: snapshot.sourceDocuments,
-    evidence: snapshot.evidenceCards,
+    overview: workingRecord.workspaceSnapshot.analysis,
+    strategy: workingRecord.workspaceSnapshot.framing,
+    arguments: workingRecord.workspaceSnapshot.myArguments,
+    opponent: workingRecord.workspaceSnapshot.opponentArguments,
+    rebuttals: workingRecord.workspaceSnapshot.rebuttals,
+    vulnerabilities: workingRecord.workspaceSnapshot.vulnerabilities,
+    crossExam: workingRecord.workspaceSnapshot.crossExam,
+    speeches: workingRecord.workspaceSnapshot.speechDrafts.map((draft) => ({
+      ...draft,
+      content: getEffectiveSpeechContent(workingRecord, draft.type),
+    })),
+    live: {
+      ...workingRecord.workspaceSnapshot.liveSheet,
+      topArguments: getEffectiveLiveArguments(workingRecord),
+      quickestRebuttals: getEffectiveLiveRebuttals(workingRecord),
+      trapQuestions: getEffectiveTrapQuestions(workingRecord),
+      closingLine:
+        workingRecord.workspaceOverlay.selectedWinningPath ??
+        workingRecord.workspaceSnapshot.liveSheet.closingLine,
+    },
+    judge: workingRecord.workspaceSnapshot.judgeSummary,
+    sources: workingRecord.workspaceSnapshot.sourceDocuments,
+    evidence: workingRecord.workspaceSnapshot.evidenceCards,
   };
 }

@@ -7,6 +7,10 @@ import { NextResponse, type NextRequest } from "next/server";
  * Next.js 16+ uses `proxy.ts` (replaces deprecated `middleware.ts`).
  */
 export async function proxy(request: NextRequest) {
+  if (request.nextUrl.pathname.startsWith("/_next/")) {
+    return NextResponse.next();
+  }
+
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !anon) {
@@ -44,6 +48,6 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|_next/webpack-hmr|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

@@ -77,3 +77,83 @@ export function normalizeDebateSetupForm(
 }
 
 export type DebateSetupFormValues = z.infer<typeof debateSetupFormSchema>;
+
+const speechEditSchema = z
+  .object({
+    opening: z.string().optional(),
+    body: z.string().optional(),
+    rebuttal: z.string().optional(),
+    closing: z.string().optional(),
+    short: z.string().optional(),
+  })
+  .default({});
+
+const workspaceNotesSchema = z
+  .object({
+    case: z.string().optional(),
+    opponent: z.string().optional(),
+    vulnerabilities: z.string().optional(),
+    cross_ex: z.string().optional(),
+    speeches: z.string().optional(),
+    understand: z.string().optional(),
+    build: z.string().optional(),
+    practice: z.string().optional(),
+    live: z.string().optional(),
+  })
+  .default({});
+
+const moduleStateSchema = z
+  .object({
+    case: z
+      .object({
+        collapsed: z.boolean(),
+        pinned: z.boolean(),
+      })
+      .optional(),
+    opponent: z
+      .object({
+        collapsed: z.boolean(),
+        pinned: z.boolean(),
+      })
+      .optional(),
+    vulnerabilities: z
+      .object({
+        collapsed: z.boolean(),
+        pinned: z.boolean(),
+      })
+      .optional(),
+    cross_ex: z
+      .object({
+        collapsed: z.boolean(),
+        pinned: z.boolean(),
+      })
+      .optional(),
+    speeches: z
+      .object({
+        collapsed: z.boolean(),
+        pinned: z.boolean(),
+      })
+      .optional(),
+  })
+  .default({});
+
+export const workspaceOverlaySchema = z.object({
+  pinnedArgumentIds: z.array(z.string()).default([]),
+  pinnedRebuttalIds: z.array(z.string()).default([]),
+  selectedWinningPath: z.string().nullable().default(null),
+  speechEdits: speechEditSchema,
+  notes: workspaceNotesSchema,
+  simplifiedPhrasing: z.record(z.string(), z.string()).default({}),
+  liveSheetOrder: z.object({
+    argumentIds: z.array(z.string()).default([]),
+    rebuttalIds: z.array(z.string()).default([]),
+    trapQuestionIds: z.array(z.string()).default([]),
+  }),
+  moduleState: moduleStateSchema,
+});
+
+export function normalizeWorkspaceOverlayForm(
+  value: z.infer<typeof workspaceOverlaySchema>,
+) {
+  return workspaceOverlaySchema.parse(value);
+}

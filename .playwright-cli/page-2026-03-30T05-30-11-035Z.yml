@@ -1,0 +1,79 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e14]:
+    - banner [ref=e15]:
+      - generic [ref=e16]:
+        - link "Debate Command Debate intelligence platform" [ref=e17] [cursor=pointer]:
+          - /url: /
+          - img [ref=e19]
+          - generic [ref=e21]:
+            - generic [ref=e22]: Debate Command
+            - generic [ref=e23]: Debate intelligence platform
+        - navigation [ref=e24]:
+          - link "Dashboard" [ref=e25] [cursor=pointer]:
+            - /url: /dashboard
+            - img
+            - text: Dashboard
+          - link "Start a debate" [ref=e26] [cursor=pointer]:
+            - /url: /debates/new
+          - link "Settings" [ref=e27] [cursor=pointer]:
+            - /url: /settings
+            - img
+            - text: Settings
+        - generic [ref=e28]:
+          - button "Toggle theme" [ref=e29]:
+            - img
+            - text: Light
+          - generic [ref=e30]:
+            - link "Log in" [ref=e31] [cursor=pointer]:
+              - /url: /login
+            - link "Sign up" [ref=e32] [cursor=pointer]:
+              - /url: /signup
+    - main [ref=e33]:
+      - generic [ref=e34]:
+        - paragraph [ref=e35]: Settings
+        - heading "Provider health and workspace defaults" [level=1] [ref=e36]
+        - paragraph [ref=e37]: Review which capabilities are active, confirm the current operating mode, and adjust local display preferences.
+      - generic [ref=e38]:
+        - generic [ref=e39]:
+          - generic [ref=e40]:
+            - heading "Capability health" [level=3] [ref=e41]
+            - generic [ref=e42]: Debate Command adapts live to available providers and storage.
+          - generic [ref=e43]:
+            - generic [ref=e44]:
+              - generic [ref=e45]:
+                - generic [ref=e46]: Public retrieval
+                - generic [ref=e47]: ready
+              - paragraph [ref=e48]: OpenAlex and Crossref discovery remain available without extra keys.
+            - generic [ref=e49]:
+              - generic [ref=e50]:
+                - generic [ref=e51]: Provider-backed discovery
+                - generic [ref=e52]: ready
+              - paragraph [ref=e53]: Tavily is configured for broader source discovery.
+            - generic [ref=e54]:
+              - generic [ref=e55]:
+                - generic [ref=e56]: Structured synthesis
+                - generic [ref=e57]: ready
+              - paragraph [ref=e58]: Gemini enhancement is available.
+            - generic [ref=e59]:
+              - generic [ref=e60]:
+                - generic [ref=e61]: Practice depth
+                - generic [ref=e62]: ready
+              - paragraph [ref=e63]: Adaptive opponent simulation is enabled.
+            - generic [ref=e64]:
+              - generic [ref=e65]:
+                - generic [ref=e66]: Persistence
+                - generic [ref=e67]: ready
+              - paragraph [ref=e68]: Supabase Postgres query path is healthy.
+        - generic [ref=e69]:
+          - generic [ref=e70]:
+            - heading "Display" [level=3] [ref=e71]
+            - generic [ref=e72]: Theme and local environment status.
+          - generic [ref=e73]:
+            - button "Toggle theme" [ref=e74]:
+              - img
+              - text: Light
+            - generic [ref=e75]: Debate Command automatically degrades from provider-assisted generation to deterministic generation if provider calls fail or keys are missing.
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e9] [cursor=pointer]:
+    - img [ref=e10]
+  - alert [ref=e13]

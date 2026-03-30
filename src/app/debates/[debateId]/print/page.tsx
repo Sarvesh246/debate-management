@@ -29,7 +29,7 @@ export default async function DebatePrintPage({
     createdAt: new Date().toISOString(),
   });
 
-  const packet = hydrateExportPacket(debate.workspaceSnapshot);
+  const packet = hydrateExportPacket(debate);
 
   return (
     <main className="mx-auto max-w-4xl space-y-10 px-6 py-10 print:max-w-none print:px-0">
@@ -58,7 +58,7 @@ export default async function DebatePrintPage({
             <div key={source.id}>
               <h3 className="font-medium">{source.title}</h3>
               <p className="text-sm text-muted-foreground">
-                {source.organization} • {source.sourceType} • {source.url}
+                {source.organization} | {source.sourceType} | {source.url}
               </p>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">{source.excerpt}</p>
             </div>
@@ -71,7 +71,7 @@ export default async function DebatePrintPage({
           <h2 className="font-heading text-2xl">Live sheet</h2>
           <ul className="grid gap-2 text-sm leading-6 text-muted-foreground">
             {packet.live.topArguments.map((item) => (
-              <li key={item}>• {item}</li>
+              <li key={item}>- {item}</li>
             ))}
           </ul>
         </section>
@@ -83,7 +83,7 @@ export default async function DebatePrintPage({
           <p className="text-sm leading-6 text-muted-foreground">{packet.judge.honestAssessment}</p>
           <ul className="grid gap-2 text-sm leading-6 text-muted-foreground">
             {packet.judge.frameworkBreakdown.map((item) => (
-              <li key={item}>• {item}</li>
+              <li key={item}>- {item}</li>
             ))}
           </ul>
         </section>

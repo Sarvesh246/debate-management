@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
   boolean,
   index,
@@ -12,6 +13,7 @@ import type {
   DebateWorkspaceSnapshot,
   LiveSheet,
   PracticeSessionRecord,
+  WorkspaceOverlay,
 } from "@/features/debates/types";
 
 export const users = pgTable("users", {
@@ -53,6 +55,7 @@ export const debateWorkspaces = pgTable(
     providerStatus: text("provider_status").notNull(),
     degradationReason: text("degradation_reason"),
     workspaceSnapshot: jsonb("workspace_snapshot").$type<DebateWorkspaceSnapshot>().notNull(),
+    workspaceOverlay: jsonb("workspace_overlay").$type<WorkspaceOverlay>().notNull().default(sql`'{}'::jsonb`),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },

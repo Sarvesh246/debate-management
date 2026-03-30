@@ -1,0 +1,58 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e4]:
+    - banner [ref=e5]:
+      - generic [ref=e6]:
+        - link "Debate Command Debate intelligence platform" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - img [ref=e9]
+          - generic [ref=e11]:
+            - generic [ref=e12]: Debate Command
+            - generic [ref=e13]: Debate intelligence platform
+        - navigation [ref=e14]:
+          - link "Dashboard" [ref=e15] [cursor=pointer]:
+            - /url: /dashboard
+            - img
+            - text: Dashboard
+          - link "Start a debate" [ref=e16] [cursor=pointer]:
+            - /url: /debates/new
+          - link "Settings" [ref=e17] [cursor=pointer]:
+            - /url: /settings
+            - img
+            - text: Settings
+        - generic [ref=e18]:
+          - button "Toggle theme" [ref=e19]:
+            - img
+            - text: Light
+          - generic [ref=e20]:
+            - link "Log in" [ref=e21] [cursor=pointer]:
+              - /url: /login
+            - link "Sign up" [ref=e22] [cursor=pointer]:
+              - /url: /signup
+    - main [ref=e23]:
+      - generic [ref=e24]:
+        - paragraph [ref=e25]: Authentication
+        - heading "Return to your command center." [level=1] [ref=e26]
+        - paragraph [ref=e27]: Log in to access saved debates, evidence libraries, practice sessions, and export history. If Supabase is not configured, the app still runs in local workspace mode.
+        - generic [ref=e28]:
+          - text: Need an account?
+          - link "Create one" [ref=e29] [cursor=pointer]:
+            - /url: /signup
+      - generic [ref=e30]:
+        - generic [ref=e31]:
+          - img [ref=e33]
+          - generic [ref=e36]:
+            - heading "Log in" [level=3] [ref=e37]
+            - generic [ref=e38]: Save debates, revisit workspaces, and keep your evidence bank organized.
+        - generic [ref=e40]:
+          - generic [ref=e41]:
+            - generic [ref=e42]: Email
+            - textbox "Email" [ref=e43]:
+              - /placeholder: coach@debatecommand.ai
+          - generic [ref=e44]:
+            - generic [ref=e45]: Password
+            - textbox "Password" [ref=e46]:
+              - /placeholder: Strong password
+          - generic [ref=e47]:
+            - button "Log in" [ref=e48]
+            - button "Send magic link" [ref=e49]
+  - region "Notifications alt+T"

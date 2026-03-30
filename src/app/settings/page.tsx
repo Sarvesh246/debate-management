@@ -1,8 +1,8 @@
 import { ShieldAlert } from "lucide-react";
 import { SiteHeader } from "@/components/layout/site-header";
-import { CapabilityHealthPanel } from "@/components/debate/client-panels";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import type { CapabilityDescriptor } from "@/features/debates/types";
 import {
   canUseLocalWorkspaceMode,
   DEPLOYED_SUPABASE_CONFIG_ERROR,
@@ -13,6 +13,7 @@ import {
   getDatabaseSetupGuidance,
   type DatabaseFailureKind,
 } from "@/server/db/errors";
+import { getCapabilitySnapshot } from "@/server/capabilities/service";
 
 export default async function SettingsPage({
   searchParams,
@@ -25,6 +26,14 @@ export default async function SettingsPage({
   const missingSupabaseEnvNames = getMissingSupabaseServerEnvNames();
   const databaseSetupKind = (params.kind ?? "unknown") as DatabaseFailureKind;
   const needsDatabaseSetup = params.setup === "database";
+  const capabilitySnapshot = await getCapabilitySnapshot();
+  const capabilityRows: CapabilityDescriptor[] = [
+    capabilitySnapshot.publicRetrieval,
+    capabilitySnapshot.providerDiscovery,
+    capabilitySnapshot.structuredSynthesis,
+    capabilitySnapshot.practiceSimulationDepth,
+    capabilitySnapshot.persistence,
+  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -86,7 +95,30 @@ export default async function SettingsPage({
         ) : null}
 
         <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-          <CapabilityHealthPanel />
+          <Card className="border-border/70">
+            <CardHeader>
+              <CardTitle>Capability health</CardTitle>
+              <CardDescription>
+                Debate Command adapts live to available providers and storage.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {capabilityRows.map((row) => (
+                <div
+                  key={row.label}
+                  className="rounded-2xl border border-border/70 bg-background/60 p-4"
+                >
+                  <div className="mb-1 flex items-center justify-between gap-3">
+                    <div className="font-medium">{row.label}</div>
+                    <div className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
+                      {row.status}
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{row.detail}</p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
           <Card className="border-border/70 bg-card/75">
             <CardHeader>
               <CardTitle>Display</CardTitle>
