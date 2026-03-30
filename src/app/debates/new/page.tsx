@@ -1,11 +1,10 @@
 import { DebateSetupWizard } from "@/components/debate/setup-wizard";
 import { SiteHeader } from "@/components/layout/site-header";
-import { getAppModeLabel } from "@/server/services/debate-access";
 
 export default function NewDebatePage() {
   return (
     <div className="min-h-screen bg-background">
-      <SiteHeader appModeLabel={getAppModeLabel()} />
+      <SiteHeader />
       <main className="mx-auto max-w-7xl space-y-8 px-4 py-10 sm:px-6">
         <div className="space-y-2">
           <p className="text-sm uppercase tracking-[0.22em] text-primary">New debate</p>

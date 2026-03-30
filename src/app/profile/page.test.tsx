@@ -2,27 +2,28 @@ import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const requireAppUserMock = vi.fn();
-const getAppModeLabelMock = vi.fn(() => "Authenticated workspace mode");
 
 vi.mock("@/server/services/debate-access", () => ({
   requireAppUser: requireAppUserMock,
-  getAppModeLabel: getAppModeLabelMock,
 }));
 
 vi.mock("@/components/layout/site-header", () => ({
-  SiteHeader: ({ appModeLabel }: { appModeLabel?: string }) => (
-    <div data-testid="site-header">{appModeLabel}</div>
-  ),
+  SiteHeader: () => <div data-testid="site-header" />,
 }));
 
 vi.mock("@/components/auth/sign-out-button", () => ({
   SignOutButton: () => <button type="button">Sign out</button>,
 }));
 
+vi.mock("@/components/profile/display-name-editor", () => ({
+  DisplayNameEditor: ({ initialName }: { initialName: string }) => (
+    <div data-testid="display-name">{initialName}</div>
+  ),
+}));
+
 describe("ProfilePage", () => {
   beforeEach(() => {
     requireAppUserMock.mockReset();
-    getAppModeLabelMock.mockClear();
   });
 
   it("renders authenticated profile content", async () => {

@@ -16,6 +16,8 @@ export interface UserContext {
 
 export interface HeaderViewer extends UserContext {
   initials: string;
+  /** Shown in the account menu (e.g. "Authenticated Workspace"). */
+  workspaceModeLabel: string;
 }
 
 const DEPLOYMENT_ERROR_PREFIX = "Supabase is required in deployed environments";
@@ -104,6 +106,17 @@ export const getOptionalUserContext = cache(async (): Promise<UserContext | null
   }
 });
 
+export function isLocalMode() {
+  return !isSupabaseConfigured() && canUseLocalWorkspaceMode();
+}
+
+function workspaceModeLabelForHeader() {
+  if (!isSupabaseConfigured() && !canUseLocalWorkspaceMode()) {
+    return "Configuration required";
+  }
+  return isLocalMode() ? "Local Workspace" : "Authenticated Workspace";
+}
+
 export const getHeaderViewer = cache(async (): Promise<HeaderViewer | null> => {
   const user = await getOptionalUserContext();
   if (!user) {
@@ -113,9 +126,6 @@ export const getHeaderViewer = cache(async (): Promise<HeaderViewer | null> => {
   return {
     ...user,
     initials: getUserInitials(user.name, user.email),
+    workspaceModeLabel: workspaceModeLabelForHeader(),
   };
 });
-
-export function isLocalMode() {
-  return !isSupabaseConfigured() && canUseLocalWorkspaceMode();
-}

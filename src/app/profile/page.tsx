@@ -3,9 +3,10 @@ import Link from "next/link";
 import { CircleUserRound, LayoutDashboard, Settings, SquarePen } from "lucide-react";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { SiteHeader } from "@/components/layout/site-header";
+import { DisplayNameEditor } from "@/components/profile/display-name-editor";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getUserInitials } from "@/lib/auth";
-import { getAppModeLabel, requireAppUser } from "@/server/services/debate-access";
+import { requireAppUser } from "@/server/services/debate-access";
 
 export default async function ProfilePage() {
   const user = await requireAppUser();
@@ -13,7 +14,7 @@ export default async function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SiteHeader appModeLabel={getAppModeLabel()} />
+      <SiteHeader />
       <main className="mx-auto max-w-7xl space-y-8 px-4 py-10 sm:px-6">
         <div className="space-y-2">
           <p className="text-sm uppercase tracking-[0.22em] text-primary">Profile</p>
@@ -39,12 +40,11 @@ export default async function ProfilePage() {
                   {initials}
                 </div>
                 <div className="space-y-2">
-                  <div>
-                    <div className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
-                      Display name
-                    </div>
-                    <div className="text-lg font-medium">{user.name}</div>
-                  </div>
+                  <DisplayNameEditor
+                    key={user.name}
+                    initialName={user.name}
+                    authenticated={user.mode === "authenticated"}
+                  />
                   <div>
                     <div className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
                       Email

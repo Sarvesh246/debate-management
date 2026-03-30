@@ -3,7 +3,10 @@ import { rm } from "node:fs/promises";
 import path from "node:path";
 import { clearEnvCache, DEPLOYED_SUPABASE_CONFIG_ERROR } from "@/lib/env";
 import { generateDebateWorkspace } from "@/server/services/debate-generator";
-import { getDebateRepository } from "@/server/repositories/debate-repository";
+import {
+  buildDebateScopedRowId,
+  getDebateRepository,
+} from "@/server/repositories/debate-repository";
 import type { DebateSetupInput } from "@/features/debates/types";
 
 const MOCK_STORE_PATH = path.join(process.cwd(), ".data", "mock-store.json");
@@ -46,6 +49,15 @@ afterEach(async () => {
 });
 
 describe("debate repository", () => {
+  it("scopes deterministic row ids to a debate", () => {
+    expect(buildDebateScopedRowId("debate-1", "energy-criterion-1")).toBe(
+      "debate-1:energy-criterion-1",
+    );
+    expect(buildDebateScopedRowId("debate-2", "energy-criterion-1")).toBe(
+      "debate-2:energy-criterion-1",
+    );
+  });
+
   it("preserves concurrent mock saves in local mode", async () => {
     const repository = await getDebateRepository();
 

@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
-import { getCurrentUserContext, isLocalMode } from "@/lib/auth";
-import { canUseLocalWorkspaceMode, isSupabaseConfigured } from "@/lib/env";
+import { getCurrentUserContext } from "@/lib/auth";
 import { getDatabaseFailureKind } from "@/server/db/errors";
 import { getDebateRepository } from "@/server/repositories/debate-repository";
 
@@ -42,12 +41,4 @@ export async function getDebateForCurrentUser(debateId: string) {
   } catch (error) {
     redirect(`/settings?setup=database&kind=${getDatabaseFailureKind(error)}`);
   }
-}
-
-export function getAppModeLabel() {
-  if (!isSupabaseConfigured() && !canUseLocalWorkspaceMode()) {
-    return "Configuration required";
-  }
-
-  return isLocalMode() ? "Local workspace mode" : "Authenticated workspace mode";
 }

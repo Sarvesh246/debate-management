@@ -3,7 +3,6 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { CapabilityHealthPanel } from "@/components/debate/client-panels";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { getAppModeLabel } from "@/server/services/debate-access";
 import {
   canUseLocalWorkspaceMode,
   DEPLOYED_SUPABASE_CONFIG_ERROR,
@@ -29,7 +28,7 @@ export default async function SettingsPage({
 
   return (
     <div className="min-h-screen bg-background">
-      <SiteHeader appModeLabel={getAppModeLabel()} />
+      <SiteHeader />
       <main className="mx-auto max-w-7xl space-y-8 px-4 py-10 sm:px-6">
         <div className="space-y-2">
           <p className="text-sm uppercase tracking-[0.22em] text-primary">Settings</p>

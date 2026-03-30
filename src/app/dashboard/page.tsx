@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import type { DebateWorkspaceRecord } from "@/features/debates/types";
 import { getDatabaseFailureDetail, getDatabaseFailureKind, getDatabaseSetupGuidance } from "@/server/db/errors";
 import { getDebateRepository } from "@/server/repositories/debate-repository";
-import { getAppModeLabel, requireAppUser } from "@/server/services/debate-access";
+import { requireAppUser } from "@/server/services/debate-access";
 
 export default async function DashboardPage() {
   let debates: DebateWorkspaceRecord[] = [];
@@ -33,7 +33,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SiteHeader appModeLabel={getAppModeLabel()} />
+      <SiteHeader />
       <main className="mx-auto max-w-7xl space-y-8 px-4 py-10 sm:px-6">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div className="space-y-2">

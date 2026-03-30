@@ -68,6 +68,7 @@ describe("SiteHeaderShell", () => {
           email: "casey@example.com",
           initials: "CC",
           mode: "authenticated",
+          workspaceModeLabel: "Authenticated Workspace",
         }}
       />,
     );
@@ -97,6 +98,7 @@ describe("SiteHeaderShell", () => {
           email: "local@debate-command.dev",
           initials: "LW",
           mode: "local",
+          workspaceModeLabel: "Local Workspace",
         }}
       />,
     );

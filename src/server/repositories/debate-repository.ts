@@ -85,6 +85,10 @@ export interface DebateRepository {
   saveExportRecord(record: ExportRecord): Promise<void>;
 }
 
+export function buildDebateScopedRowId(debateId: string, localId: string) {
+  return `${debateId}:${localId}`;
+}
+
 async function createMockRepository(): Promise<DebateRepository> {
   return {
     async listDebates(userId) {
@@ -259,7 +263,7 @@ async function createDatabaseRepository(): Promise<DebateRepository> {
         if (record.workspaceSnapshot.criteria.length > 0) {
           await tx.insert(debateCriteria).values(
             record.workspaceSnapshot.criteria.map((criterion) => ({
-              id: criterion.id,
+              id: buildDebateScopedRowId(record.id, criterion.id),
               debateId: record.id,
               name: criterion.name,
               description: criterion.description,

@@ -71,7 +71,7 @@ export function HeaderAccountMenu({
               {viewer.email ?? "Local workspace mode"}
             </div>
             <div className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-              {viewer.mode === "authenticated" ? "Authenticated workspace" : "Local workspace"}
+              {viewer.workspaceModeLabel}
             </div>
           </div>
         </DropdownMenuLabel>

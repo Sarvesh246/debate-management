@@ -5,23 +5,17 @@ import { HeaderAccountMenu, HeaderGuestMenu } from "@/components/layout/header-a
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 
-interface SiteHeaderProps {
-  appModeLabel?: string;
-}
-
-interface SiteHeaderShellProps extends SiteHeaderProps {
+interface SiteHeaderShellProps {
   viewer: HeaderViewer | null;
 }
 
-export async function SiteHeader(props: SiteHeaderProps) {
+export async function SiteHeader() {
   const viewer = await getHeaderViewer();
-  return <SiteHeaderShell {...props} viewer={viewer} />;
+  return <SiteHeaderShell viewer={viewer} />;
 }
 
-export function SiteHeaderShell({ appModeLabel, viewer }: SiteHeaderShellProps) {
+export function SiteHeaderShell({ viewer }: SiteHeaderShellProps) {
   const hasWorkspaceIdentity = viewer !== null;
-  const displayModeLabel =
-    viewer !== null || appModeLabel === "Configuration required" ? appModeLabel : undefined;
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/90 backdrop-blur-xl">
@@ -59,11 +53,6 @@ export function SiteHeaderShell({ appModeLabel, viewer }: SiteHeaderShellProps) 
         </nav>
 
         <div className="flex items-center gap-2">
-          {displayModeLabel ? (
-            <div className="hidden rounded-full border border-border/70 px-3 py-1 text-xs text-muted-foreground sm:block">
-              {displayModeLabel}
-            </div>
-          ) : null}
           <ThemeToggle />
 
           {hasWorkspaceIdentity ? (
