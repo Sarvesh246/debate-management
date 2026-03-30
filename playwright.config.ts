@@ -8,9 +8,10 @@ export default defineConfig({
     trace: "retain-on-failure",
   },
   webServer: {
-    command: "cross-env DISABLE_NETWORK_RETRIEVAL=1 npm run dev",
+    command:
+      "cross-env DISABLE_NETWORK_RETRIEVAL=1 NEXT_PUBLIC_SUPABASE_URL= NEXT_PUBLIC_SUPABASE_ANON_KEY= DATABASE_URL= GEMINI_API_KEY= TAVILY_API_KEY= npm run dev",
     url: "http://localhost:3000",
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
     timeout: 120_000,
   },
   projects: [

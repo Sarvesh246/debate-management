@@ -1,5 +1,17 @@
 import { expect, test } from "@playwright/test";
 
+test("opens the local workspace profile from the header menu", async ({ page }) => {
+  await page.goto("/");
+
+  await page.getByRole("button", { name: /open workspace menu/i }).click();
+  await expect(page.getByRole("menuitem", { name: /view profile/i })).toBeVisible();
+  await page.getByRole("menuitem", { name: /view profile/i }).click();
+
+  await expect(page).toHaveURL("/profile");
+  await expect(page.getByRole("heading", { name: /account and workspace identity/i })).toBeVisible();
+  await expect(page.getByRole("link", { name: /log in/i })).toBeVisible();
+});
+
 test("creates a debate and opens core views in deterministic mode", async ({ page }) => {
   await page.goto("/debates/new");
   await expect(page.getByRole("heading", { name: /configure the round/i })).toBeVisible();

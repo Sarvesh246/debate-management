@@ -14,6 +14,31 @@ export interface UserContext {
   mode: "authenticated" | "local";
 }
 
+export interface HeaderViewer extends UserContext {
+  initials: string;
+}
+
+const DEPLOYMENT_ERROR_PREFIX = "Supabase is required in deployed environments";
+
+export function getUserInitials(name?: string, email?: string) {
+  const fallbackEmail = email?.split("@")[0] ?? email;
+  const base = (name && name.trim().length > 0 ? name : fallbackEmail ?? "Debater").trim();
+  const pieces = base
+    .split(/[\s@._-]+/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  if (pieces.length === 0) {
+    return "DB";
+  }
+
+  if (pieces.length === 1) {
+    return pieces[0]!.slice(0, 2).toUpperCase();
+  }
+
+  return `${pieces[0]![0] ?? ""}${pieces[1]![0] ?? ""}`.toUpperCase();
+}
+
 export const getCurrentUserContext = cache(async (): Promise<UserContext> => {
   if (!isSupabaseConfigured()) {
     if (!canUseLocalWorkspaceMode()) {
@@ -61,6 +86,33 @@ export const getCurrentUserContext = cache(async (): Promise<UserContext> => {
       (user.user_metadata?.full_name as string | undefined) ??
       (user.email?.split("@")[0] ?? "Debater"),
     mode: "authenticated",
+  };
+});
+
+export const getOptionalUserContext = cache(async (): Promise<UserContext | null> => {
+  try {
+    return await getCurrentUserContext();
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      (error.message === "AUTH_REQUIRED" ||
+        error.message.startsWith(DEPLOYMENT_ERROR_PREFIX))
+    ) {
+      return null;
+    }
+    throw error;
+  }
+});
+
+export const getHeaderViewer = cache(async (): Promise<HeaderViewer | null> => {
+  const user = await getOptionalUserContext();
+  if (!user) {
+    return null;
+  }
+
+  return {
+    ...user,
+    initials: getUserInitials(user.name, user.email),
   };
 });
 
