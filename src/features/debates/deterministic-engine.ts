@@ -43,10 +43,6 @@ const stopWords = new Set([
   "future",
 ]);
 
-function sentenceCase(value: string) {
-  return value.charAt(0).toUpperCase() + value.slice(1);
-}
-
 function extractKeywords(...parts: string[]) {
   const counts = new Map<string, number>();
   for (const token of parts.join(" ").toLowerCase().match(/[a-z][a-z-]{2,}/g) ?? []) {
@@ -175,7 +171,7 @@ export function buildEvidenceCards(
           ? "This evidence is useful but somewhat indirect for the claim."
           : "The main weakness is that the opponent can contest interpretation rather than source quality.";
 
-    const supportedClaim = `${sentenceCase(primaryCriterion)} is a live decision standard in this round, and this source supports a comparison relevant to that standard.`;
+    const supportedClaim = `This source gives you a concrete, quotable detail about ${primaryCriterion.toLowerCase()}—see the excerpt below.`;
     return {
       id: nanoid(),
       sourceId: source.id,
@@ -183,33 +179,33 @@ export function buildEvidenceCards(
       criterionTags: [primaryCriterion],
       supportedClaim,
       excerpt,
-      interpretation: `${source.organization} provides evidence that can be read to support a ${primaryCriterion.toLowerCase()} comparison.`,
-      debateSummary: `Use this card when you want a concise, source-backed point on ${primaryCriterion.toLowerCase()}.`,
+      interpretation: `${source.organization} published information you can use when the round focuses on ${primaryCriterion.toLowerCase()}.`,
+      debateSummary: `Pull this card when you need a short, source-backed line about ${primaryCriterion.toLowerCase()}.`,
       confidenceLabel,
       weaknessNote: weakness,
       favorite: source.credibilityScore >= 0.88,
       credibilityLabel: source.credibilityLabel,
-      whyItMatters: `${primaryCriterion} is decisive when judges care about comparative outcomes instead of slogans.`,
-      plainEnglish: `In plain English: this source helps explain ${primaryCriterion.toLowerCase()} in a way a judge can follow quickly.`,
+      whyItMatters: `${primaryCriterion} often decides which side sounds more reasonable once both teams have spoken.`,
+      plainEnglish: `Simple takeaway: use this when you need to explain ${primaryCriterion.toLowerCase()} with words from a real source, not just your opinion.`,
       possibleWeakness: weakness,
       claimUnits: [
         { id: nanoid(), layer: "fact", text: excerpt, evidenceCardIds: [] },
         {
           id: nanoid(),
           layer: "interpretation",
-          text: `${source.organization} is relevant because it speaks directly to ${primaryCriterion.toLowerCase()}.`,
+          text: `${source.organization} matters here because it talks about ${primaryCriterion.toLowerCase()} in a way you can repeat in a speech.`,
           evidenceCardIds: [],
         },
         {
           id: nanoid(),
           layer: "inference",
-          text: `This suggests the side that performs better on ${primaryCriterion.toLowerCase()} gains an important edge.`,
+          text: `This suggests that whichever side handles ${primaryCriterion.toLowerCase()} more convincingly can swing the round.`,
           evidenceCardIds: [],
         },
         {
           id: nanoid(),
           layer: "impact",
-          text: `${primaryCriterion} changes who looks more credible under judge pressure.`,
+          text: `Impact: strong material on ${primaryCriterion.toLowerCase()} makes your side easier to remember when the judge fills the ballot.`,
           evidenceCardIds: [],
         },
       ],

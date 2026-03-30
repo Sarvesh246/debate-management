@@ -11,7 +11,7 @@ async function createDebate(page: Page) {
 
   await page.getByRole("button", { name: /build workspace/i }).click();
   await expect(page).toHaveURL(/\/debates\/[^/]+\?intro=1/, { timeout: 20_000 });
-  await expect(page.getByRole("heading", { name: /assembling your debate command center/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /getting your workspace ready/i })).toBeVisible();
 
   const debateId = page.url().match(/\/debates\/([^/?]+)/)?.[1];
   if (!debateId) {
@@ -34,7 +34,7 @@ test("creates a debate and moves through the simplified workspace flow", async (
   const debateId = await createDebate(page);
 
   await expect(page.getByText(/round brief and criteria/i)).toBeVisible();
-  await page.getByRole("link", { name: /open command center/i }).click();
+  await page.getByRole("link", { name: /open workspace/i }).click();
 
   await expect(page).toHaveURL(/\/understand/, { timeout: 20_000 });
   await expect(page.getByRole("heading", { name: /see the round clearly/i })).toBeVisible();
@@ -60,7 +60,7 @@ test("creates a debate and moves through the simplified workspace flow", async (
   await expect(page.getByRole("heading", { name: /speeches/i })).toBeVisible();
 });
 
-test("practice pillar is reachable from the new command center", async ({ page }) => {
+test("practice pillar is reachable from the workspace", async ({ page }) => {
   const debateId = await createDebate(page);
   await page.goto(`/debates/${debateId}/practice`);
 

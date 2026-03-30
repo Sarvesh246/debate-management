@@ -2,7 +2,6 @@ import {
   audienceLevels,
   buildModules,
   debateFormats,
-  primaryWorkspacePillars,
   sourcePreferenceModes,
   type BuildModule,
   type LegacyWorkspaceSection,
@@ -32,12 +31,12 @@ export const sourceModeLabels = Object.fromEntries(
   sourcePreferenceModes.map((mode) => [mode, mode.replaceAll("_", " ")]),
 ) as Record<(typeof sourcePreferenceModes)[number], string>;
 
-export const pillarLabels = Object.fromEntries(
-  primaryWorkspacePillars.map((pillar) => [
-    pillar,
-    pillar.charAt(0).toUpperCase() + pillar.slice(1),
-  ]),
-) as Record<WorkspacePillar, string>;
+export const pillarLabels = {
+  understand: "See the round",
+  build: "Build your case",
+  practice: "Practice",
+  live: "Round day",
+} satisfies Record<WorkspacePillar, string>;
 
 export const toolLabels = {
   sources: "Sources",

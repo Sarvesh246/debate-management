@@ -11,11 +11,21 @@ const NO_EXCERPT_PREFIX = "No excerpt available";
 export interface LinkedFactItem {
   id: string;
   heading: string;
+  /** Primary claim line (from the evidence card; citeable). */
+  supportedClaim: string;
+  /** Short fact line used in lists (claim unit or excerpt snippet). */
   fact: string;
+  /** Full excerpt from the source document (quote-friendly). */
+  sourceExcerpt: string;
+  /** Plain-language explanation from the evidence card. */
+  plainEnglish: string;
+  /** Context: argument summary or rebuttal line. */
   note: string;
   sourceTitle: string;
   sourceUrl: string;
   organization: string;
+  author?: string;
+  publishedAt?: string;
   credibilityLabel: string;
   evidenceCardId: string;
 }
@@ -62,11 +72,16 @@ function buildFactItem({
   return {
     id: `${heading}:${card.id}`,
     heading,
+    supportedClaim: card.supportedClaim,
     fact,
+    sourceExcerpt: source.excerpt,
+    plainEnglish: card.plainEnglish,
     note,
     sourceTitle: source.title,
     sourceUrl: source.url,
     organization: source.organization,
+    author: source.author,
+    publishedAt: source.publishedAt,
     credibilityLabel: card.credibilityLabel,
     evidenceCardId: card.id,
   };

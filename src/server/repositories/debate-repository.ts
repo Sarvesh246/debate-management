@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { nanoid } from "nanoid";
@@ -90,6 +90,8 @@ export interface DebateRepository {
   savePracticeSession(record: PracticeSessionRecord): Promise<void>;
   listPracticeSessions(debateId: string): Promise<PracticeSessionRecord[]>;
   saveExportRecord(record: ExportRecord): Promise<void>;
+  deleteDebate(userId: string, debateId: string): Promise<boolean>;
+  deleteAllDebates(userId: string): Promise<number>;
 }
 
 export function buildDebateScopedRowId(debateId: string, localId: string) {
@@ -183,6 +185,37 @@ async function createMockRepository(): Promise<DebateRepository> {
         await persistMockStore(store);
       });
     },
+    async deleteDebate(userId, debateId) {
+      return withMockStoreLock(async () => {
+        const store = await ensureMockStore();
+        const index = store.debates.findIndex((d) => d.id === debateId && d.userId === userId);
+        if (index < 0) {
+          return false;
+        }
+        store.debates.splice(index, 1);
+        store.debateRuns = store.debateRuns.filter((r) => r.debateId !== debateId);
+        store.practiceSessions = store.practiceSessions.filter((p) => p.debateId !== debateId);
+        store.exportRecords = store.exportRecords.filter((e) => e.debateId !== debateId);
+        await persistMockStore(store);
+        return true;
+      });
+    },
+    async deleteAllDebates(userId) {
+      return withMockStoreLock(async () => {
+        const store = await ensureMockStore();
+        const ids = new Set(store.debates.filter((d) => d.userId === userId).map((d) => d.id));
+        const count = ids.size;
+        if (count === 0) {
+          return 0;
+        }
+        store.debates = store.debates.filter((d) => !ids.has(d.id));
+        store.debateRuns = store.debateRuns.filter((r) => !ids.has(r.debateId));
+        store.practiceSessions = store.practiceSessions.filter((p) => !ids.has(p.debateId));
+        store.exportRecords = store.exportRecords.filter((e) => !ids.has(e.debateId));
+        await persistMockStore(store);
+        return count;
+      });
+    },
   };
 }
 
@@ -217,6 +250,36 @@ async function createDatabaseRepository(): Promise<DebateRepository> {
       createdAt: row.createdAt.toISOString(),
       updatedAt: row.updatedAt.toISOString(),
     });
+  }
+
+  type DbTx = Parameters<Parameters<typeof db.transaction>[0]>[0];
+
+  async function deleteDebateWorkspaceRows(tx: DbTx, debateId: string) {
+    const argRows = await tx
+      .select({ id: argumentsTable.id })
+      .from(argumentsTable)
+      .where(eq(argumentsTable.debateId, debateId));
+    const argumentIds = argRows.map((r) => r.id);
+    if (argumentIds.length > 0) {
+      await tx.delete(argumentEvidenceLinks).where(inArray(argumentEvidenceLinks.argumentId, argumentIds));
+    }
+
+    await Promise.all([
+      tx.delete(debateCriteria).where(eq(debateCriteria.debateId, debateId)),
+      tx.delete(sourceDocuments).where(eq(sourceDocuments.debateId, debateId)),
+      tx.delete(evidenceCards).where(eq(evidenceCards.debateId, debateId)),
+      tx.delete(argumentsTable).where(eq(argumentsTable.debateId, debateId)),
+      tx.delete(rebuttals).where(eq(rebuttals.debateId, debateId)),
+      tx.delete(vulnerabilities).where(eq(vulnerabilities.debateId, debateId)),
+      tx.delete(crossExamItems).where(eq(crossExamItems.debateId, debateId)),
+      tx.delete(speechDrafts).where(eq(speechDrafts.debateId, debateId)),
+      tx.delete(liveSheets).where(eq(liveSheets.debateId, debateId)),
+      tx.delete(debateRuns).where(eq(debateRuns.debateId, debateId)),
+      tx.delete(practiceSessions).where(eq(practiceSessions.debateId, debateId)),
+      tx.delete(exportRecords).where(eq(exportRecords.debateId, debateId)),
+    ]);
+
+    await tx.delete(debateWorkspaces).where(eq(debateWorkspaces.id, debateId));
   }
 
   return {
@@ -563,6 +626,38 @@ async function createDatabaseRepository(): Promise<DebateRepository> {
         workspaceOverlay: normalized,
         updatedAt: new Date(),
       });
+    },
+    async deleteDebate(userId, debateId) {
+      const [row] = await db
+        .select()
+        .from(debateWorkspaces)
+        .where(eq(debateWorkspaces.id, debateId));
+
+      if (!row || row.userId !== userId) {
+        return false;
+      }
+
+      await db.transaction(async (tx) => {
+        await deleteDebateWorkspaceRows(tx, debateId);
+      });
+      return true;
+    },
+    async deleteAllDebates(userId) {
+      const rows = await db
+        .select({ id: debateWorkspaces.id })
+        .from(debateWorkspaces)
+        .where(eq(debateWorkspaces.userId, userId));
+      const ids = rows.map((r) => r.id);
+      if (ids.length === 0) {
+        return 0;
+      }
+
+      await db.transaction(async (tx) => {
+        for (const id of ids) {
+          await deleteDebateWorkspaceRows(tx, id);
+        }
+      });
+      return ids.length;
     },
   };
 }

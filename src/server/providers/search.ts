@@ -1,5 +1,6 @@
 import { load } from "cheerio";
 import sanitizeHtml from "sanitize-html";
+import { inferDomainPack } from "@/features/debates/domain-packs";
 import type {
   DebateSetupInput,
   ResearchQuery,
@@ -25,6 +26,46 @@ interface SearchAdapter {
   enabled: boolean;
   search(query: ResearchQuery, setup: DebateSetupInput): Promise<SearchResultCandidate[]>;
 }
+
+const searchStopWords = new Set([
+  "the",
+  "and",
+  "that",
+  "with",
+  "from",
+  "what",
+  "should",
+  "would",
+  "could",
+  "this",
+  "their",
+  "about",
+  "into",
+  "your",
+  "than",
+  "have",
+  "will",
+  "best",
+  "source",
+  "sources",
+  "future",
+  "yes",
+  "no",
+  "ban",
+  "allow",
+  "default",
+  "discretion",
+  "outcomes",
+  "trusted",
+  "trust",
+  "data",
+  "evidence",
+  "study",
+  "report",
+  "analysis",
+  "united",
+  "states",
+]);
 
 function stripTags(value?: string) {
   if (!value) return "";
@@ -104,6 +145,82 @@ function sourceModeAllows(sourceType: string, mode: SourcePreferenceMode) {
   }
 }
 
+function extractSearchKeywords(...values: Array<string | undefined>) {
+  const counts = new Map<string, number>();
+  for (const value of values) {
+    for (const token of value?.toLowerCase().match(/[a-z][a-z-]{2,}/g) ?? []) {
+      if (searchStopWords.has(token)) continue;
+      counts.set(token, (counts.get(token) ?? 0) + 1);
+    }
+  }
+
+  return [...counts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .map(([token]) => token);
+}
+
+function countKeywordHits(text: string, keywords: string[]) {
+  const tokens = new Set(text.match(/[a-z][a-z-]{2,}/g) ?? []);
+  return keywords.filter((keyword) => tokens.has(keyword)).length;
+}
+
+export function scoreQueryRelevance(
+  candidate: SearchResultCandidate,
+  query: ResearchQuery,
+  setup: DebateSetupInput,
+) {
+  const pack = inferDomainPack(setup.resolution, setup.mySide, setup.opponentSide);
+  const topicKeywords = extractSearchKeywords(
+    setup.resolution,
+    setup.mySide,
+    setup.opponentSide,
+  );
+  const domainKeywords = extractSearchKeywords(
+    ...pack.keywords,
+  );
+  const criterionKeywords = extractSearchKeywords(
+    ...query.criterionTags,
+    query.purpose,
+  );
+  const candidateText = [
+    candidate.title,
+    candidate.organization,
+    candidate.author,
+    candidate.excerpt,
+    candidate.processedText?.slice(0, 500),
+    candidate.metadata ? JSON.stringify(candidate.metadata) : undefined,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  const topicHits = countKeywordHits(candidateText, topicKeywords);
+  const domainHits = countKeywordHits(candidateText, domainKeywords);
+  const criterionHits = countKeywordHits(candidateText, criterionKeywords);
+  const exactCriterionBonus = query.criterionTags.some((tag) =>
+    candidateText.includes(tag.toLowerCase()),
+  )
+    ? 0.18
+    : 0;
+  const exactResolutionBonus = candidateText.includes(setup.resolution.toLowerCase()) ? 0.22 : 0;
+  const score = Math.min(
+    1,
+    topicHits * 0.28 +
+      domainHits * 0.12 +
+      criterionHits * 0.18 +
+      exactCriterionBonus +
+      exactResolutionBonus,
+  );
+
+  return {
+    score,
+    debateHits: topicHits + domainHits,
+    topicHits,
+    domainHits,
+    criterionHits,
+  };
+}
+
 function buildNormalizedSource(
   candidate: SearchResultCandidate,
   query: ResearchQuery,
@@ -135,11 +252,25 @@ function buildNormalizedSource(
   }
 
   const excerpt = stripTags(candidate.excerpt || candidate.processedText);
+  const relevance = scoreQueryRelevance(candidate, query, setup);
+  if (
+    relevance.score < 0.46 &&
+    !(
+      relevance.topicHits >= 1 ||
+      (relevance.domainHits >= 1 && relevance.criterionHits >= 1)
+    )
+  ) {
+    return null;
+  }
+
   const freshnessScore = scoreFreshness(candidate.publishedAt);
   const credibilityScore = scoreCredibility(sourceType, candidate.organization, excerpt);
   const directnessScore = Math.min(
     1,
-    0.45 + query.criterionTags.length * 0.09 + (excerpt.length > 180 ? 0.1 : 0),
+    0.22 +
+      relevance.score * 0.6 +
+      query.criterionTags.length * 0.05 +
+      (excerpt.length > 180 ? 0.08 : 0),
   );
 
   return {
@@ -160,6 +291,7 @@ function buildNormalizedSource(
       ...(candidate.metadata ?? {}),
       providerQuery: query.query,
       purpose: query.purpose,
+      relevanceScore: relevance.score,
     },
     queryId: query.id,
     sideIntent: query.side,
@@ -191,7 +323,7 @@ function createOpenAlexAdapter(): SearchAdapter {
         "id,display_name,primary_location,publication_year,authorships,abstract_inverted_index,type",
       );
       const response = await fetch(url, {
-        headers: { "User-Agent": "DebateCommand/1.0" },
+        headers: { "User-Agent": "Cogent/1.0" },
         next: { revalidate: 3600 },
       });
       if (!response.ok) return [];
@@ -240,7 +372,7 @@ function createCrossrefAdapter(): SearchAdapter {
       url.searchParams.set("query", query.query);
       url.searchParams.set("rows", "5");
       const response = await fetch(url, {
-        headers: { "User-Agent": "DebateCommand/1.0" },
+        headers: { "User-Agent": "Cogent/1.0" },
         next: { revalidate: 3600 },
       });
       if (!response.ok) return [];
@@ -356,18 +488,35 @@ export async function discoverSources(
     }
   }
 
-  return [...deduped.values()]
-    .sort(
-      (a, b) =>
-        b.credibilityScore + b.directnessScore + b.freshnessScore -
-        (a.credibilityScore + a.directnessScore + a.freshnessScore),
-    )
-    .slice(0, 16);
+  const ranked = [...deduped.values()].sort((a, b) => {
+    const aRelevance = Number(a.metadata.relevanceScore ?? 0);
+    const bRelevance = Number(b.metadata.relevanceScore ?? 0);
+    return (
+      bRelevance * 2 + b.credibilityScore + b.directnessScore + b.freshnessScore -
+      (aRelevance * 2 + a.credibilityScore + a.directnessScore + a.freshnessScore)
+    );
+  });
+
+  const strongMatches = ranked.filter(
+    (source) => Number(source.metadata.relevanceScore ?? 0) >= 0.5,
+  );
+  const fallbackMatches = ranked.filter(
+    (source) => Number(source.metadata.relevanceScore ?? 0) >= 0.4,
+  );
+
+  const selected =
+    strongMatches.length >= 6
+      ? strongMatches
+      : fallbackMatches.length >= 6
+        ? fallbackMatches
+        : ranked;
+
+  return selected.slice(0, 12);
 }
 
 export async function fetchDocumentText(url: string) {
   const response = await fetch(url, {
-    headers: { "User-Agent": "DebateCommand/1.0" },
+    headers: { "User-Agent": "Cogent/1.0" },
   });
   if (!response.ok) {
     throw new Error(`Could not import document from ${url}.`);

@@ -99,7 +99,7 @@ export default async function SettingsPage({
             <CardHeader>
               <CardTitle>Capability health</CardTitle>
               <CardDescription>
-                Debate Command adapts live to available providers and storage.
+                Cogent adapts to the providers and storage you have connected.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -127,7 +127,7 @@ export default async function SettingsPage({
             <CardContent className="space-y-4 text-sm text-muted-foreground">
               <ThemeToggle />
               <div className="rounded-2xl border border-border/70 bg-background/60 p-4">
-                Debate Command automatically degrades from provider-assisted generation to deterministic generation if provider calls fail or keys are missing.
+                If the AI provider fails or keys are missing, Cogent falls back to the built-in engine so your workspace still works.
               </div>
             </CardContent>
           </Card>

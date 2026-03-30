@@ -52,7 +52,7 @@ export function CapabilityHealthPanel() {
       <CardHeader>
         <CardTitle>Capability health</CardTitle>
         <CardDescription>
-          Debate Command adapts live to available providers and storage.
+          Cogent adapts to the providers and storage you have connected.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">

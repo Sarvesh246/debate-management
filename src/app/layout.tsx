@@ -21,11 +21,11 @@ const ibmPlexMono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Debate Command",
-    template: "%s | Debate Command",
+    default: "Cogent",
+    template: "%s | Cogent",
   },
   description:
-    "Debate Command is a debate intelligence platform for source-backed strategy, rebuttals, live-round prep, and trustworthy speaking materials.",
+    "Cogent is debate prep with clear sources: criteria, evidence, arguments, rebuttals, speeches, and live-round tools for students and competitors.",
 };
 
 export default function RootLayout({

@@ -1,6 +1,6 @@
-# Debate Command
+# Cogent
 
-Debate Command is a debate intelligence platform built for structured, trustworthy debate prep. It takes a resolution, both sides, debate format, and audience level, then produces a usable debate workspace with:
+Cogent is debate prep software for students and competitors. It takes a resolution, both sides, debate format, and audience level, then produces a usable workspace with:
 
 - resolution analysis and framing
 - trustworthy source retrieval with fallback
@@ -35,7 +35,7 @@ It is not a generic chatbot. The app is organized as a debate workspace and rema
 
 ### 1. Provider-assisted mode
 
-If `GEMINI_API_KEY` and optional retrieval keys are configured, Debate Command enhances speeches and coaching output and expands retrieval breadth.
+If `GEMINI_API_KEY` and optional retrieval keys are configured, Cogent enhances speeches and coaching output and expands retrieval breadth.
 
 ### 2. Deterministic fallback mode
 

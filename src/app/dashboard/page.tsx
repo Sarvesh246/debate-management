@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { unstable_rethrow } from "next/navigation";
-import { FolderClock, Plus, ShieldAlert } from "lucide-react";
+import { Plus, ShieldAlert } from "lucide-react";
+import { RecentDebates } from "@/components/dashboard/recent-debates";
 import { SiteHeader } from "@/components/layout/site-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -92,40 +93,7 @@ export default async function DashboardPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">
-              {debates.length > 0 ? (
-                debates.map((debate) => (
-                  <Link
-                    key={debate.id}
-                    href={`/debates/${debate.id}/understand`}
-                    className="rounded-3xl border border-border/70 bg-background/60 p-5 transition hover:border-primary/30 hover:bg-background"
-                  >
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                      <div>
-                        <div className="font-medium">{debate.title}</div>
-                        <div className="text-sm text-muted-foreground">{debate.resolution}</div>
-                      </div>
-                      <div className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
-                        {debate.generationMode}
-                      </div>
-                    </div>
-                    <div className="mt-4 flex flex-wrap gap-2 text-xs text-muted-foreground">
-                      <span>{debate.format.replaceAll("_", " ")}</span>
-                      <span>&bull;</span>
-                      <span>{debate.audienceLevel.replaceAll("_", " ")}</span>
-                      <span>&bull;</span>
-                      <span>{new Date(debate.updatedAt).toLocaleString()}</span>
-                    </div>
-                  </Link>
-                ))
-              ) : (
-                <div className="rounded-3xl border border-dashed border-border/70 bg-background/50 p-10 text-center">
-                  <FolderClock className="mx-auto mb-4 size-10 text-muted-foreground" />
-                  <div className="text-lg font-medium">Nothing saved yet</div>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    Your first workspace will appear here after generation completes.
-                  </p>
-                </div>
-              )}
+              <RecentDebates debates={debates} />
             </CardContent>
           </Card>
 

@@ -117,7 +117,7 @@ export function AuthFormCard({ mode }: { mode: Mode }) {
         <form action={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" name="email" type="email" placeholder="coach@debatecommand.ai" required />
+            <Input id="email" name="email" type="email" placeholder="you@school.edu" required />
           </div>
           {mode !== "forgot" ? (
             <div className="space-y-2">

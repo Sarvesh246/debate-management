@@ -109,6 +109,9 @@ describe("fact bank helpers", () => {
     expect(items.length).toBeGreaterThan(0);
     expect(items[0]?.sourceUrl).toBe("https://example.org/natural-gas");
     expect(items[0]?.fact).toContain("Natural gas infrastructure");
+    expect(items[0]?.supportedClaim.length).toBeGreaterThan(10);
+    expect(items[0]?.sourceExcerpt).toContain("Natural gas");
+    expect(items[0]?.plainEnglish.length).toBeGreaterThan(10);
   });
 
   it("returns source-linked opponent pressure facts and rebuttal questions", () => {

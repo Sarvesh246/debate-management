@@ -7,6 +7,7 @@ import type { DebateWorkspaceRecord } from "@/features/debates/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { StaggerItem } from "@/components/motion/fade-in";
 import { Badge } from "@/components/ui/badge";
 
 const stageDelayMs = 450;
@@ -67,7 +68,7 @@ export function DebateBuildFlow({
           debate.workspaceSnapshot.liveSheet.closingLine,
         details:
           debate.generationMode === "deterministic"
-            ? "Deterministic mode is active. You can still use the full command center."
+            ? "Built-in mode is active. Your full workspace is still available."
             : "Provider-assisted polish is active. Review and adjust the working overlay as needed.",
         icon: <CheckCircle2 className="size-4" />,
       },
@@ -102,9 +103,9 @@ export function DebateBuildFlow({
         </div>
         <div className="space-y-2">
           <p className="text-sm uppercase tracking-[0.22em] text-primary">Build flow</p>
-          <h1 className="font-heading text-4xl tracking-tight">Assembling your debate command center</h1>
+          <h1 className="font-heading text-4xl tracking-tight">Getting your workspace ready</h1>
           <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
-            The workspace is ready. This build view walks through the round brief, evidence, case construction, and live-use prep in the order you actually need them.
+            Your debate workspace is prepared. This screen walks through the brief, sources, your case, rebuttals, and round-day prep in a sensible order.
           </p>
         </div>
       </div>
@@ -126,7 +127,7 @@ export function DebateBuildFlow({
             <Progress value={progress} />
             <div className="flex items-center justify-between text-xs text-muted-foreground">
               <span>{visibleStages} of {stages.length} stages visible</span>
-              <span>{complete ? "Command center unlocked" : "Preparing the next stage"}</span>
+              <span>{complete ? "Workspace ready" : "Preparing the next stage"}</span>
             </div>
           </div>
         </CardHeader>
@@ -138,9 +139,9 @@ export function DebateBuildFlow({
           const isNext = index === visibleStages;
 
           return (
+            <StaggerItem key={stage.title} index={index}>
             <Card
-              key={stage.title}
-              className={`border-border/70 transition ${
+              className={`border-border/70 transition-colors ${
                 isVisible
                   ? "bg-card/80"
                   : "bg-card/40 text-muted-foreground"
@@ -170,6 +171,7 @@ export function DebateBuildFlow({
                 </div>
               </CardContent>
             </Card>
+            </StaggerItem>
           );
         })}
       </div>
@@ -177,7 +179,7 @@ export function DebateBuildFlow({
       <div className="flex flex-wrap gap-3">
         <Button asChild size="lg">
           <Link href={`/debates/${debate.id}/understand`}>
-            Open command center
+            Open workspace
             <ArrowRight className="size-4" />
           </Link>
         </Button>

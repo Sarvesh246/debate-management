@@ -19,9 +19,9 @@ export default async function NewDebatePage() {
           <p className="text-sm uppercase tracking-[0.22em] text-primary">New debate</p>
             <h1 className="font-heading text-4xl tracking-tight">Start fast. Let the system build the rest in stages.</h1>
             <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
-              Enter the resolution and sides first. Debate Command will build the round brief, retrieve and score
-              evidence, assemble arguments, stress-test rebuttals, and prepare the live packet in a cleaner
-              command-center flow. If provider-backed synthesis is unavailable, the deterministic engine takes over
+              Enter the resolution and sides first. Cogent will build the round brief, retrieve and score
+              evidence, assemble arguments, stress-test rebuttals, and prepare the live packet in a clear
+              step-by-step flow. If AI polish is unavailable, the built-in engine still completes your workspace
               automatically.
             </p>
           </div>

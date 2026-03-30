@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { ArrowRight, ExternalLink, FileOutput, Pin } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -58,6 +58,11 @@ export function WorkspaceView({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [isSaving, startTransition] = useTransition();
+  const [isMobileSheet, setIsMobileSheet] = useState(() =>
+    typeof window !== "undefined"
+      ? window.matchMedia("(max-width: 1279px)").matches
+      : false,
+  );
   const [overlay, setOverlay] = useState(() =>
     normalizeWorkspaceOverlay(debate.workspaceOverlay, debate.workspaceSnapshot),
   );
@@ -106,20 +111,32 @@ export function WorkspaceView({
     ? "xl:grid-cols-[220px_minmax(0,1fr)_360px]"
     : "xl:grid-cols-[220px_minmax(0,1fr)]";
 
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const mediaQuery = window.matchMedia("(max-width: 1279px)");
+    const sync = () => setIsMobileSheet(mediaQuery.matches);
+    sync();
+    mediaQuery.addEventListener("change", sync);
+    return () => mediaQuery.removeEventListener("change", sync);
+  }, []);
+
   return (
     <>
       <div className={cn("grid gap-6", layoutClass)}>
         <aside className="space-y-4 xl:sticky xl:top-24 xl:h-fit">
           <Card className="border-border/70 bg-card/75">
             <CardHeader className="space-y-3">
-              <div className="text-xs uppercase tracking-[0.22em] text-primary">Command center</div>
+              <div className="text-xs uppercase tracking-[0.22em] text-primary">Your workspace</div>
               <CardTitle className="font-heading text-2xl">{debate.title}</CardTitle>
               <CardDescription className="text-sm leading-6">{debate.resolution}</CardDescription>
               <div className="flex flex-wrap gap-2">
                 <Badge variant="secondary">{formatLabels[debate.format]}</Badge>
                 <Badge variant="secondary">{audienceLabels[debate.audienceLevel]}</Badge>
                 <Badge variant="secondary">
-                  {debate.generationMode === "deterministic" ? "Deterministic mode" : "Provider-assisted"}
+                  {debate.generationMode === "deterministic" ? "Built-in mode" : "AI-assisted"}
                 </Badge>
               </div>
             </CardHeader>
@@ -144,7 +161,7 @@ export function WorkspaceView({
           <Card className="border-border/70 bg-card/65">
             <CardHeader>
               <CardTitle className="text-base">Tools</CardTitle>
-              <CardDescription>Open utility panels without leaving this pillar.</CardDescription>
+              <CardDescription>Sources, judge view, and export—without leaving this step.</CardDescription>
             </CardHeader>
             <CardContent className="grid gap-2">
               {secondaryWorkspaceTools.map((item) => (
@@ -184,14 +201,18 @@ export function WorkspaceView({
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
                   <div className="rounded-full border border-border/70 px-3 py-1 text-xs text-muted-foreground">
-                    {isSaving ? "Saving changes" : hasWorkspaceOverlayCustomizations(overlay) ? "Working layer customized" : "Using baseline model"}
+                    {isSaving
+                      ? "Saving…"
+                      : hasWorkspaceOverlayCustomizations(overlay)
+                        ? "Your edits saved on top of the base prep"
+                        : "Using the base prep"}
                   </div>
                   <RerunDebateButton debateId={debate.id} />
                 </div>
               </div>
               {debate.degradationReason ? (
                 <div className="rounded-3xl border border-amber-500/20 bg-amber-500/10 p-4 text-sm text-amber-900 dark:text-amber-200">
-                  <div className="mb-1 font-medium">Deterministic mode is active.</div>
+                  <div className="mb-1 font-medium">Built-in mode is on.</div>
                   {debate.degradationReason}
                 </div>
               ) : null}
@@ -222,7 +243,7 @@ export function WorkspaceView({
 
           {pillar === "build" ? (
             <div className="space-y-6">
-              <Surface title="Working strategy layer" description="Edit your speaking layer here while the source-backed baseline stays intact.">
+              <Surface title="Your speaking notes" description="Edit how you want to say things. The source-backed prep underneath stays the same.">
                 <Textarea
                   rows={3}
                   value={overlay.selectedWinningPath ?? ""}
@@ -325,14 +346,14 @@ export function WorkspaceView({
           ) : null}
         </main>
 
-        {drawerOpen ? (
+        {drawerOpen && !isMobileSheet ? (
           <aside className="hidden xl:block xl:sticky xl:top-24 xl:h-[calc(100vh-7rem)]">
             <DrawerCard debate={workingDebate} tool={activeTool} evidenceCards={evidenceCards} />
           </aside>
         ) : null}
       </div>
 
-      <Sheet open={drawerOpen} onOpenChange={(open) => !open && replaceQuery({ tool: null, evidence: null })}>
+      <Sheet open={isMobileSheet && drawerOpen} onOpenChange={(open) => !open && replaceQuery({ tool: null, evidence: null })}>
         <SheetContent side="bottom" className="h-[82vh] gap-0 xl:hidden">
           <SheetHeader>
             <SheetTitle>{activeTool ? toolLabels[activeTool] : "Evidence"}</SheetTitle>
@@ -347,6 +368,16 @@ export function WorkspaceView({
       </Sheet>
     </>
   );
+}
+
+function formatSourceAttribution(item: LinkedFactItem) {
+  const parts = [
+    item.organization,
+    item.sourceTitle,
+    item.author ? `By ${item.author}` : null,
+    item.publishedAt ? `Published ${item.publishedAt}` : null,
+  ].filter(Boolean);
+  return parts.join(" · ");
 }
 
 function FactColumn({
@@ -374,20 +405,60 @@ function FactColumn({
         <div className="grid gap-3">
           {items.map((item) => (
             <Card key={item.id} className="border-border/70 bg-card/75">
-              <CardContent className="space-y-3 p-4">
+              <CardContent className="space-y-4 p-4">
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
                     <div className="text-sm font-medium text-foreground">{item.heading}</div>
-                    <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                      {item.credibilityLabel}
-                    </div>
+                    <p className="text-xs text-muted-foreground">{item.credibilityLabel} source</p>
                   </div>
                 </div>
-                <p className="text-sm leading-6 text-foreground">{item.fact}</p>
-                <p className="text-sm leading-6 text-muted-foreground">{item.note}</p>
-                <div className="rounded-2xl border border-border/70 bg-background/70 px-3 py-2 text-xs text-muted-foreground">
-                  {item.organization} | {item.sourceTitle}
+
+                <div className="space-y-1.5">
+                  <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    Claim you can cite
+                  </div>
+                  <p className="text-sm leading-6 text-foreground">{item.supportedClaim}</p>
                 </div>
+
+                <div className="space-y-1.5">
+                  <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    What the source says
+                  </div>
+                  <p className="text-sm leading-7 text-foreground">{item.sourceExcerpt}</p>
+                  {item.sourceExcerpt !== item.fact ? (
+                    <p className="text-sm leading-6 text-muted-foreground">
+                      <span className="font-medium text-foreground">{item.fact}</span>
+                    </p>
+                  ) : null}
+                </div>
+
+                <div className="space-y-1.5">
+                  <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    In simple words
+                  </div>
+                  <p className="text-sm leading-6 text-muted-foreground">{item.plainEnglish}</p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    How this helps your case
+                  </div>
+                  <p className="text-sm leading-6 text-muted-foreground">{item.note}</p>
+                </div>
+
+                <div className="rounded-2xl border border-border/70 bg-background/70 px-3 py-2 text-xs leading-5 text-muted-foreground">
+                  <div className="font-medium text-foreground">{formatSourceAttribution(item)}</div>
+                  <a
+                    href={item.sourceUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-1 inline-flex items-center gap-1 break-all text-primary underline-offset-4 hover:underline"
+                  >
+                    {item.sourceUrl}
+                    <ExternalLink className="size-3 shrink-0" />
+                  </a>
+                </div>
+
                 <div className="flex flex-wrap gap-2">
                   <Button asChild size="sm">
                     <a href={item.sourceUrl} target="_blank" rel="noreferrer">
@@ -395,13 +466,8 @@ function FactColumn({
                       <ExternalLink className="size-4" />
                     </a>
                   </Button>
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="outline"
-                    onClick={() => onOpenEvidence(item.evidenceCardId)}
-                  >
-                    See evidence
+                  <Button type="button" size="sm" variant="outline" onClick={() => onOpenEvidence(item.evidenceCardId)}>
+                    Card details
                   </Button>
                 </div>
               </CardContent>
@@ -725,31 +791,92 @@ function DrawerBody({
   if (evidenceCards.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-border/70 bg-background/50 p-6 text-sm text-muted-foreground">
-        Open a “See evidence” action from the command center to inspect source-backed claims here.
+        Open “Card details” from a fact card to read the full source-backed breakdown here.
       </div>
     );
   }
 
+  const sourceById = new Map(debate.workspaceSnapshot.sourceDocuments.map((doc) => [doc.id, doc] as const));
+
+  const layerHelp: Record<string, string> = {
+    fact: "Quote from the source",
+    interpretation: "What it means",
+    inference: "Why it matters for the round",
+    impact: "How to use it when you speak",
+  };
+
   return (
     <ScrollArea className="h-full pr-2">
       <div className="space-y-4">
-        {evidenceCards.map((card) => (
-          <Card key={card.id} className="border-border/70 bg-background/60">
-            <CardContent className="space-y-3 p-4">
-              <div className="flex flex-wrap gap-2">
-                <Badge>{card.credibilityLabel}</Badge>
-                <Badge variant="secondary">{card.confidenceLabel}</Badge>
-              </div>
-              <div className="font-medium">{card.supportedClaim}</div>
-              {card.claimUnits.map((unit) => (
-                <div key={unit.id}>
-                  <div className="text-xs uppercase tracking-[0.22em] text-muted-foreground">{unit.layer}</div>
-                  <p className="mt-1 text-sm leading-6 text-muted-foreground">{unit.text}</p>
+        {evidenceCards.map((card) => {
+          const source = sourceById.get(card.sourceId);
+          const published = source?.publishedAt;
+          const attribution = [
+            source?.organization,
+            source?.title,
+            source?.author ? `By ${source.author}` : null,
+            published ? `Published ${published}` : null,
+          ]
+            .filter(Boolean)
+            .join(" · ");
+
+          return (
+            <Card key={card.id} className="border-border/70 bg-background/60">
+              <CardContent className="space-y-4 p-4">
+                <div className="flex flex-wrap gap-2">
+                  <Badge>{card.credibilityLabel}</Badge>
+                  <Badge variant="secondary">{card.confidenceLabel}</Badge>
                 </div>
-              ))}
-            </CardContent>
-          </Card>
-        ))}
+
+                <div className="space-y-1">
+                  <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    Claim
+                  </div>
+                  <p className="text-sm font-medium leading-6 text-foreground">{card.supportedClaim}</p>
+                </div>
+
+                {source ? (
+                  <div className="space-y-1">
+                    <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                      Full excerpt from the source
+                    </div>
+                    <p className="text-sm leading-7 text-foreground">{source.excerpt}</p>
+                    {attribution ? (
+                      <p className="text-xs leading-5 text-muted-foreground">{attribution}</p>
+                    ) : null}
+                    <a
+                      href={source.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 text-sm text-primary underline-offset-4 hover:underline"
+                    >
+                      Open original article
+                      <ExternalLink className="size-4" />
+                    </a>
+                  </div>
+                ) : null}
+
+                <div className="space-y-1">
+                  <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    In simple words
+                  </div>
+                  <p className="text-sm leading-6 text-muted-foreground">{card.plainEnglish}</p>
+                </div>
+
+                <div className="space-y-3 border-t border-border/60 pt-3">
+                  {card.claimUnits.map((unit) => (
+                    <div key={unit.id}>
+                      <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                        {layerHelp[unit.layer] ?? unit.layer}
+                      </div>
+                      <p className="mt-1 text-sm leading-6 text-foreground">{unit.text}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </ScrollArea>
   );

@@ -25,7 +25,7 @@ export function SignOutButton({
 
     startTransition(async () => {
       try {
-        await supabase?.auth.signOut();
+        await supabase?.auth.signOut({ scope: "local" });
       } finally {
         router.replace("/login");
         router.refresh();

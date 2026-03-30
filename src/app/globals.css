@@ -134,6 +134,12 @@
 }
 
 @layer base {
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
   html {
     @apply bg-background font-sans text-foreground;
     /* Keeps focused/scrollIntoView targets clear of the sticky site header (mobile e2e + keyboard nav). */

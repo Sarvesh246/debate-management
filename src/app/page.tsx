@@ -1,14 +1,15 @@
 import Link from "next/link";
 import { ArrowRight, BrainCircuit, ShieldCheck, Sparkles, Swords } from "lucide-react";
+import { FadeIn } from "@/components/motion/fade-in";
 import { SiteHeader } from "@/components/layout/site-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const features = [
-  "Resolution analysis and judge-facing framing",
-  "Evidence cards with trust labels and claim separation",
-  "Opponent simulation, rebuttals, and vulnerability scanning",
-  "Cross-ex prep, speech drafts, live mode, and judge mode",
+  "What the round is really about (in plain terms)",
+  "Evidence with sources, trust labels, and clear claims",
+  "Opponent case, rebuttals, and where you might be weak",
+  "Cross-ex questions, speech drafts, live sheet, and judge view",
 ];
 
 export default function Home() {
@@ -18,17 +19,18 @@ export default function Home() {
       <main>
         <section className="surface-grid overflow-hidden border-b border-border/70">
           <div className="mx-auto grid max-w-7xl gap-12 px-4 py-18 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:py-24">
-            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
+            <FadeIn>
+            <div className="space-y-8">
               <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/8 px-4 py-2 text-sm text-primary">
                 <ShieldCheck className="size-4" />
-                Trustworthy debate prep with deterministic fallback
+                Source-backed prep with a built-in fallback
               </div>
               <div className="space-y-5">
                 <h1 className="max-w-4xl font-heading text-5xl leading-[1.02] tracking-tight text-balance sm:text-6xl">
-                  Debate Command is a debate operating system, not a generic chatbot.
+                  Cogent is for real debate prep—not a generic chatbot.
                 </h1>
                 <p className="max-w-2xl text-lg leading-8 text-muted-foreground">
-                  Turn a resolution and two sides into a source-backed battle plan: criteria, framing, evidence cards, opponent case, rebuttals, speeches, judge view, and live-round prep.
+                  Start from a resolution and both sides. Cogent builds a source-backed plan: what matters in the round, evidence you can cite, your case, counterarguments, speeches, and a simple live sheet for round day.
                 </p>
               </div>
               <div className="flex flex-wrap gap-3">
@@ -50,8 +52,9 @@ export default function Home() {
                 ))}
               </div>
             </div>
+            </FadeIn>
 
-            <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 lg:pl-6">
+            <FadeIn delay={0.1} className="lg:pl-6">
               <Card className="overflow-hidden border-border/70 bg-card/80 shadow-2xl shadow-primary/10">
                 <CardHeader className="border-b border-border/70 bg-background/50">
                   <CardTitle className="font-heading text-2xl">Sample round</CardTitle>
@@ -77,7 +80,7 @@ export default function Home() {
                   />
                 </CardContent>
               </Card>
-            </div>
+            </FadeIn>
           </div>
         </section>
 

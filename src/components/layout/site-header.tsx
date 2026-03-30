@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Command, LayoutDashboard, Plus, ShieldCheck } from "lucide-react";
+import { CircleDot, LayoutDashboard, Plus, ShieldCheck } from "lucide-react";
 import { getHeaderViewer, type HeaderViewer } from "@/lib/auth";
 import { HeaderAccountMenu, HeaderGuestMenu } from "@/components/layout/header-account-menu";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -22,14 +22,14 @@ export function SiteHeaderShell({ viewer }: SiteHeaderShellProps) {
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
         <Link href="/" className="flex min-w-0 items-center gap-3">
           <div className="flex size-10 items-center justify-center rounded-2xl bg-primary/12 text-primary">
-            <Command className="size-5" />
+            <CircleDot className="size-5" />
           </div>
           <div className="min-w-0">
             <div className="truncate font-heading text-lg font-semibold tracking-tight">
-              Debate Command
+              Cogent
             </div>
             <div className="truncate text-xs text-muted-foreground">
-              Debate intelligence platform
+              Clear debate prep
             </div>
           </div>
         </Link>

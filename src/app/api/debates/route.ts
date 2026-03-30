@@ -5,6 +5,25 @@ import { normalizeDebateSetupForm } from "@/features/debates/validation";
 import { generateDebateWorkspace } from "@/server/services/debate-generator";
 import { getDebateRepository } from "@/server/repositories/debate-repository";
 
+export async function DELETE() {
+  try {
+    const user = await getCurrentUserContext();
+    const repository = await getDebateRepository();
+    const deleted = await repository.deleteAllDebates(user.id);
+    return NextResponse.json({ deleted });
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Could not delete debates.";
+    const status =
+      message === "AUTH_REQUIRED"
+        ? 401
+        : message === DEPLOYED_SUPABASE_CONFIG_ERROR
+          ? 503
+          : 400;
+    return NextResponse.json({ error: message }, { status });
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const user = await getCurrentUserContext();

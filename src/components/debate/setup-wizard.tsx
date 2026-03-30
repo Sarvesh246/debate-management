@@ -335,7 +335,7 @@ export function DebateSetupWizard() {
           <CardHeader>
             <CardTitle className="font-heading text-2xl">What happens next</CardTitle>
             <CardDescription>
-              The system will guide you through a staged build flow before opening the full command center.
+              You will see a short build flow, then land in your full workspace.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
